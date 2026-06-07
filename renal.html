@@ -1,0 +1,728 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Renal Outline Quiz</title>
+  <style>
+    :root {
+      --ink: #101410;
+      --paper: #f7efe0;
+      --cream: #fff9ee;
+      --green: #0f3b2f;
+      --sage: #c9ddb8;
+      --gold: #f4aa19;
+      --red: #b94a34;
+      --blue: #243f70;
+      --muted: rgba(16, 20, 16, 0.68);
+      --shadow: 12px 12px 0 rgba(15, 59, 47, 0.92), 0 24px 70px rgba(15, 59, 47, 0.22);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: Georgia, "Times New Roman", serif;
+      background:
+        radial-gradient(circle at 14% 16%, rgba(244, 170, 25, 0.34), transparent 28%),
+        radial-gradient(circle at 86% 12%, rgba(36, 63, 112, 0.17), transparent 28%),
+        linear-gradient(135deg, #fbf4e7, #dcc596);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.18;
+      background-image:
+        linear-gradient(90deg, rgba(15,59,47,.14) 1px, transparent 1px),
+        linear-gradient(rgba(15,59,47,.1) 1px, transparent 1px);
+      background-size: 34px 34px;
+      mask-image: radial-gradient(circle at center, black, transparent 80%);
+    }
+
+    .shell {
+      position: relative;
+      width: min(1120px, calc(100vw - 30px));
+      margin: 0 auto;
+      padding: 26px 0 34px;
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 18px;
+      align-items: end;
+      margin-bottom: 24px;
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      font: 800 12px/1 "Trebuchet MS", sans-serif;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--red);
+    }
+
+    h1 {
+      margin: 0;
+      color: var(--green);
+      font-size: clamp(38px, 7vw, 78px);
+      line-height: .88;
+      letter-spacing: -.055em;
+    }
+
+    .score-card {
+      min-width: 220px;
+      padding: 15px 18px;
+      border: 2px solid var(--green);
+      background: rgba(255, 249, 238, .75);
+      box-shadow: 8px 8px 0 var(--green);
+      text-align: right;
+      font: 900 13px/1.4 "Trebuchet MS", sans-serif;
+      text-transform: uppercase;
+      letter-spacing: .09em;
+    }
+
+    .quiz-nav {
+      grid-column: 1 / -1;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font: 900 12px/1 "Trebuchet MS", sans-serif;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    .quiz-nav a {
+      border: 2px solid var(--green);
+      border-radius: 999px;
+      padding: 10px 12px;
+      background: rgba(255,249,238,.75);
+      color: var(--green);
+      text-decoration: none;
+      box-shadow: 4px 4px 0 rgba(15,59,47,.22);
+    }
+
+    .quiz-nav a[aria-current="page"] {
+      background: var(--green);
+      color: var(--paper);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .quiz-card {
+      border: 3px solid var(--green);
+      border-radius: 30px;
+      min-height: 610px;
+      padding: clamp(24px, 4vw, 48px);
+      background:
+        linear-gradient(145deg, rgba(255,255,255,.65), transparent 34%),
+        repeating-linear-gradient(0deg, rgba(15,59,47,.055) 0 1px, transparent 1px 22px),
+        var(--paper);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .quiz-card::after {
+      content: "RENAL";
+      position: absolute;
+      right: -24px;
+      bottom: -28px;
+      font: 900 clamp(78px, 15vw, 144px)/1 "Trebuchet MS", sans-serif;
+      letter-spacing: -.1em;
+      color: rgba(15,59,47,.055);
+      pointer-events: none;
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+      font: 900 12px/1 "Trebuchet MS", sans-serif;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+      color: var(--blue);
+    }
+
+    .chip {
+      border: 2px solid currentColor;
+      border-radius: 999px;
+      padding: 7px 10px;
+      background: rgba(244,170,25,.18);
+    }
+
+    .question {
+      margin: 0 0 24px;
+      color: var(--green);
+      font-size: clamp(28px, 4.5vw, 54px);
+      line-height: .98;
+      letter-spacing: -.045em;
+      max-width: 900px;
+    }
+
+    .choices {
+      display: grid;
+      gap: 12px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .choice {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 13px;
+      align-items: center;
+      width: 100%;
+      border: 2px solid var(--green);
+      border-radius: 18px;
+      padding: 15px 16px;
+      background: rgba(255,249,238,.72);
+      color: var(--ink);
+      font: 800 16px/1.25 "Trebuchet MS", sans-serif;
+      text-align: left;
+      cursor: pointer;
+      box-shadow: 5px 5px 0 rgba(15,59,47,.28);
+      transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
+    }
+
+    .choice:hover:not(:disabled) {
+      transform: translate(-1px, -1px);
+      box-shadow: 7px 7px 0 rgba(15,59,47,.28);
+      background: #fffaf0;
+    }
+
+    .choice:disabled { cursor: default; }
+    .choice.correct { background: #dff0cf; border-color: #1f6c3d; }
+    .choice.wrong { background: #f2c9bd; border-color: var(--red); }
+
+    .letter {
+      display: inline-grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--green);
+      color: var(--paper);
+      font-size: 13px;
+    }
+
+    .feedback {
+      display: none;
+      position: relative;
+      z-index: 1;
+      margin-top: 22px;
+      border: 2px solid var(--green);
+      border-radius: 18px;
+      padding: 16px;
+      background: rgba(255,249,238,.78);
+      font: 800 15px/1.45 "Trebuchet MS", sans-serif;
+    }
+
+    .feedback.show { display: block; }
+    .feedback strong { color: var(--red); text-transform: uppercase; letter-spacing: .08em; }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 22px;
+      position: relative;
+      z-index: 1;
+    }
+
+    button.action {
+      border: 2px solid var(--green);
+      border-radius: 16px;
+      padding: 13px 16px;
+      background: var(--green);
+      color: var(--paper);
+      font: 900 13px/1 "Trebuchet MS", sans-serif;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: 4px 4px 0 rgba(15,59,47,.3);
+    }
+
+    button.action.secondary { background: var(--cream); color: var(--green); }
+    button.action.gold { background: var(--gold); color: var(--ink); }
+    aside { display: grid; gap: 14px; }
+
+    .panel {
+      border: 2px solid var(--green);
+      border-radius: 22px;
+      padding: 18px;
+      background: rgba(255,249,238,.75);
+      box-shadow: 8px 8px 0 rgba(15,59,47,.86);
+    }
+
+    .panel-title {
+      margin: 0 0 10px;
+      color: var(--red);
+      font: 900 13px/1 "Trebuchet MS", sans-serif;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+    }
+
+    .meter-label {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+      font: 900 12px/1 "Trebuchet MS", sans-serif;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    .bar {
+      height: 16px;
+      border: 2px solid var(--green);
+      border-radius: 999px;
+      overflow: hidden;
+      background: rgba(15,59,47,.12);
+    }
+
+    .bar span {
+      display: block;
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, var(--gold), var(--red));
+      transition: width 240ms ease;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .stat {
+      border: 2px solid rgba(15,59,47,.45);
+      border-radius: 14px;
+      padding: 11px;
+      background: rgba(255,255,255,.38);
+      font: 900 12px/1.25 "Trebuchet MS", sans-serif;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .stat b {
+      display: block;
+      margin-top: 5px;
+      color: var(--green);
+      font-size: 24px;
+      letter-spacing: -.04em;
+    }
+
+    .review {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 8px;
+      max-height: 310px;
+      overflow: auto;
+    }
+
+    .review li {
+      border-left: 5px solid rgba(15,59,47,.3);
+      padding: 8px 9px;
+      background: rgba(255,255,255,.36);
+      font: 800 12px/1.25 "Trebuchet MS", sans-serif;
+      cursor: pointer;
+    }
+
+    .review li.correct { border-left-color: #1f6c3d; }
+    .review li.wrong { border-left-color: var(--red); }
+    .review li.current { background: rgba(244,170,25,.25); }
+
+    .final-screen { display: none; position: relative; z-index: 2; }
+    .final-screen.show { display: block; }
+    .quiz-content.hide { display: none; }
+
+    .final-score {
+      margin: 0 0 14px;
+      color: var(--green);
+      font-size: clamp(48px, 9vw, 110px);
+      line-height: .85;
+      letter-spacing: -.07em;
+    }
+
+    .final-copy {
+      max-width: 720px;
+      color: var(--muted);
+      font: 800 18px/1.45 "Trebuchet MS", sans-serif;
+    }
+
+    @media (max-width: 900px) {
+      header, .layout { grid-template-columns: 1fr; }
+      .score-card { text-align: left; }
+      aside { order: -1; }
+      .quiz-card { min-height: auto; }
+      .review { max-height: 150px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div>
+        <p class="eyebrow">Practice Mode</p>
+        <h1>Renal Outline Quiz</h1>
+      </div>
+      <div class="score-card" id="scoreCard">Score: 0 / 0<br>Answered: 0</div>
+      <nav class="quiz-nav" aria-label="Quiz pages">
+        <a href="./">Machine Quiz</a>
+        <a href="./renal.html" aria-current="page">Renal Outline Quiz</a>
+      </nav>
+    </header>
+
+    <section class="layout">
+      <article class="quiz-card">
+        <div class="quiz-content" id="quizContent">
+          <div class="tag-row"><span class="chip" id="category">Category</span><span id="counter">Question 1 / 1</span></div>
+          <h2 class="question" id="question"></h2>
+          <div class="choices" id="choices"></div>
+          <div class="feedback" id="feedback"></div>
+          <div class="actions">
+            <button class="action secondary" id="prevBtn">Previous</button>
+            <button class="action" id="nextBtn">Next</button>
+            <button class="action gold" id="shuffleBtn">Shuffle & Restart</button>
+          </div>
+        </div>
+        <div class="final-screen" id="finalScreen">
+          <p class="eyebrow">Quiz Complete</p>
+          <h2 class="final-score" id="finalScore">0%</h2>
+          <p class="final-copy" id="finalCopy"></p>
+          <div class="actions">
+            <button class="action gold" id="restartBtn">Restart Quiz</button>
+            <button class="action secondary" id="reviewBtn">Review Missed</button>
+          </div>
+        </div>
+      </article>
+
+      <aside>
+        <div class="panel">
+          <div class="meter-label"><span>Progress</span><span id="progressText">0%</span></div>
+          <div class="bar"><span id="progressBar"></span></div>
+          <div class="stats">
+            <div class="stat">Correct<b id="correctStat">0</b></div>
+            <div class="stat">Missed<b id="wrongStat">0</b></div>
+          </div>
+        </div>
+        <div class="panel">
+          <p class="panel-title">Question Map</p>
+          <ol class="review" id="reviewList"></ol>
+        </div>
+        <div class="panel">
+          <p class="panel-title">How To Use</p>
+          <p class="final-copy" style="font-size:13px;margin:0">Pick an answer for instant feedback. Use Next to continue. Keyboard shortcuts: 1-4, arrows, R.</p>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    const questions = [
+      { category: "Renal Anatomy", q: "Which renal vessel relationship is correct?", choices: ["Right renal artery is longer and right renal vein is shorter", "Right renal artery is shorter and right renal vein is longer", "Both renal arteries are equal length", "Left renal vein is shorter than the right renal vein"], answer: 0, why: "The outline notes a longer right renal artery and shorter right renal vein; the left side has the shorter artery and longer vein." },
+      { category: "Renal Anatomy", q: "Compression of the left renal vein is associated with what pathologic concept in the outline?", choices: ["Page kidney", "Nutcracker pathology", "Horseshoe kidney", "Ureterocele"], answer: 1, why: "The outline flags left renal vein compression as a nutcracker-type pathology." },
+      { category: "Kidney Regions", q: "What is found in the outer renal cortex?", choices: ["Renal pyramids only", "Glomeruli, convoluted tubules, and blood vessels", "Only collecting ducts", "Papillae and calyces only"], answer: 1, why: "The cortex contains glomeruli, convoluted tubules of the nephron, and blood vessels." },
+      { category: "Kidney Regions", q: "The inner medulla contains which structures?", choices: ["Renal pyramids and renal columns", "Only Bowman's capsules", "Only afferent arterioles", "Only bladder trigone tissue"], answer: 0, why: "The medulla contains renal pyramids, papillae, and renal columns between pyramids." },
+      { category: "Nephron", q: "The renal corpuscle is made up of what two structures?", choices: ["Proximal and distal tubules", "Collecting duct and papilla", "Glomerular capsule and glomerulus", "Ureter and renal pelvis"], answer: 2, why: "The renal corpuscle consists of the glomerular capsule, also called Bowman's capsule, and the glomerulus." },
+      { category: "Nephron", q: "The glomerulus is best described as what?", choices: ["A capillary sandwiched between arterioles", "A vein draining the collecting duct", "A muscular tube in the ureter", "A lymphatic channel in the cortex"], answer: 0, why: "The outline describes the glomerulus as a capillary between afferent and efferent arterioles, like a portal system." },
+      { category: "Renal Blood Flow", q: "Which arteriole feeds the glomerulus and is normally larger?", choices: ["Efferent arteriole", "Afferent arteriole", "Interlobar arteriole", "Vasa recta"], answer: 1, why: "The afferent arteriole feeds the glomerulus and is larger than the efferent arteriole." },
+      { category: "Renal Blood Flow", q: "After leaving the glomerulus, the efferent arteriole becomes what?", choices: ["Peritubular capillaries", "Renal pelvis", "A collecting duct", "A ureteral valve"], answer: 0, why: "The efferent arteriole becomes peritubular capillaries surrounding the PCT, loop of Henle, and DCT." },
+      { category: "Urine Formation", q: "Which sequence best summarizes urine formation?", choices: ["Filtration, tubular reabsorption/secretion, and urine concentration", "Ventilation, diffusion, and perfusion", "Bile production, storage, and excretion", "Hemolysis, coagulation, and fibrinolysis"], answer: 0, why: "The outline lists glomerular filtration, tubular reabsorption and secretion, and urine concentration." },
+      { category: "JGA", q: "Where is the juxtaglomerular apparatus located?", choices: ["Where the ureter enters the bladder", "Where the DCT returns to its glomerulus", "Inside the renal pelvis only", "At the renal capsule surface"], answer: 1, why: "The JGA is where the distal convoluted tubule comes back to, or 'kisses,' the glomerulus." },
+      { category: "Filtration", q: "Net filtration pressure in the glomerulus normally favors what?", choices: ["Fluid movement out of the capillary into Bowman's space", "Protein movement into urine", "Fluid movement into the glomerular capillary", "Complete cessation of filtration"], answer: 0, why: "The glomerulus is a capillary bed where net filtration pressure favors fluid moving out." },
+      { category: "Filtrate", q: "Initial glomerular filtrate is essentially what?", choices: ["Whole blood with cells", "Protein-free plasma without cells", "Concentrated urine", "Lymph with red blood cells"], answer: 1, why: "Because of the glomerular filtration barrier, the initial filtrate is essentially protein-free plasma with no cells." },
+      { category: "Filtration Barrier", q: "Which structures are part of the glomerular filtration barrier?", choices: ["Capillary endothelium, basement membrane, and podocytes", "Ureter, trigone, and urethra", "Renal pelvis, calyx, and bladder", "Alveoli, bronchioles, and pleura"], answer: 0, why: "The outline lists leaky capillary endothelium, basement membrane, podocytes, foot processes, and mesangium." },
+      { category: "Filtration Barrier", q: "What roles does the mesangium have?", choices: ["Only stores urine", "Produces bile acids", "Produces filter protein and has phagocytic and contractile roles", "Only secretes aldosterone"], answer: 2, why: "Mesangial cells help produce filter protein and have phagocytic and contractile roles." },
+      { category: "GFR", q: "What average GFR value is listed in the outline?", choices: ["About 12.5 mL/min", "About 125 mL/min", "About 1.25 L/min", "About 3 L/min"], answer: 1, why: "The average GFR listed is approximately 125 mL/min." },
+      { category: "GFR", q: "What happens to GFR when glomerular capillary pressure rises?", choices: ["GFR increases", "GFR decreases to zero", "GFR is unrelated to pressure", "Protein filtration stops completely"], answer: 0, why: "Higher pressure inside glomerular capillaries increases GFR." },
+      { category: "Arteriole Tone", q: "Afferent arteriole vasodilation tends to do what?", choices: ["Decrease volume and pressure in the glomerulus", "Increase glomerular pressure and GFR", "Block filtrate flow through the ureter", "Prevent renin release forever"], answer: 1, why: "Afferent vasodilation increases blood entering the glomerulus, raising volume, pressure, and GFR." },
+      { category: "Arteriole Tone", q: "Mild efferent arteriole constriction generally does what?", choices: ["Raises glomerular pressure while renal blood flow falls", "Always decreases glomerular pressure", "Stops filtration at the basement membrane", "Makes urine isotonic immediately"], answer: 0, why: "Efferent constriction creates a traffic jam behind the glomerulus, increasing glomerular pressure but reducing flow." },
+      { category: "NFP", q: "In the NFP equation, what does PGC do?", choices: ["Pulls fluid into capillaries and lowers GFR", "Pushes fluid out and increases GFR", "Represents protein in Bowman's space", "Measures bladder pressure"], answer: 1, why: "PGC is glomerular capillary hydrostatic pressure; it pushes fluid out and increases GFR." },
+      { category: "NFP", q: "What effect does Bowman's space pressure have on GFR?", choices: ["It pushes back and lowers GFR", "It always increases GFR", "It becomes albumin", "It only changes urine pH"], answer: 0, why: "PBS is pressure in Bowman's space; it opposes filtration and decreases GFR." },
+      { category: "NFP", q: "What effect does glomerular oncotic pressure have?", choices: ["It pulls fluid into the glomerular capillary and decreases GFR", "It pushes fluid into Bowman's space", "It only affects ureteral peristalsis", "It creates renal stones"], answer: 0, why: "Albumin in glomerular capillaries creates oncotic pressure that pulls fluid inward and lowers GFR." },
+      { category: "GFR Control", q: "In practice, GFR is mainly controlled by what?", choices: ["Bladder size", "Changes in glomerular hydrostatic pressure through arteriole tone", "Urine color only", "Renal capsule thickness only"], answer: 1, why: "The outline emphasizes arteriole vasodilation or constriction as the practical controller of glomerular hydrostatic pressure and GFR." },
+      { category: "SNS", q: "Sympathetic nervous system activation does what to renal circulation?", choices: ["Dilates afferent arterioles and increases GFR", "Constrains the bladder only", "Constriction of afferent arteriole, decreased RBF/GFR, and increased renin", "Increases urine protein filtration"], answer: 2, why: "SNS activation constricts the afferent arteriole, decreasing renal blood flow and GFR while increasing renin." },
+      { category: "SNS", q: "Which situation can activate the renal sympathetic response listed in the outline?", choices: ["Hemorrhage, hypotension, or anesthesia-related MAP decrease", "High urine specific gravity only", "Eating calcium stones", "Increased bladder capacity"], answer: 0, why: "The outline lists hemorrhage, hypotension, and anesthesia through decreased MAP." },
+      { category: "PCT", q: "About how much of all tubular reabsorptive and secretory activity occurs in the PCT?", choices: ["5%", "20%", "65%", "100%"], answer: 2, why: "The proximal tubule handles about 65% of all reabsorptive and secretory processes." },
+      { category: "PCT", q: "What is true about glucose handling in the PCT?", choices: ["It is normally almost completely reabsorbed until transport maximum is exceeded", "It is never reabsorbed", "It is secreted only by the collecting duct", "It appears in urine only when GFR is zero"], answer: 0, why: "Glucose is almost completely reabsorbed until the transport maximum or renal threshold is surpassed." },
+      { category: "PCT", q: "What plasma glucose renal threshold is listed in the outline?", choices: ["About 80 mg/dL", "About 120 mg/dL", "About 180 mg/dL", "About 320 mg/dL"], answer: 2, why: "The renal threshold for glucose is listed as about 180 mg/dL." },
+      { category: "PCT", q: "Why does bulk water reabsorption occur in the PCT?", choices: ["Electrolyte reabsorption causes osmotic water reabsorption", "Water is actively pumped against sodium", "The PCT is impermeable to electrolytes", "Only ADH works in the PCT"], answer: 0, why: "Reabsorbed electrolytes create osmotic movement of water back toward peritubular capillaries." },
+      { category: "Loop of Henle", q: "The loop of Henle, taken as a whole, reabsorbs more of what than water?", choices: ["Protein and glucose", "Na+ and Cl-", "Urea and ammonia only", "Albumin and red blood cells"], answer: 1, why: "The loop of Henle reabsorbs more sodium and chloride than water, helping dilute urine." },
+      { category: "Loop of Henle", q: "Which diuretics act at the loop of Henle?", choices: ["Loop diuretics", "Thiazide diuretics only", "Potassium-sparing diuretics only", "Carbonic acid absorbents"], answer: 0, why: "The outline identifies the loop of Henle as the site of action for loop diuretics." },
+      { category: "Loop of Henle", q: "About how much filtered Na+, K+, and Cl- is reabsorbed in the thick loop of Henle?", choices: ["1% to 2%", "5%", "20% to 25%", "65% to 80%"], answer: 2, why: "The thick loop reabsorbs about 20% to 25% of the filtered load of Na+, K+, and Cl-." },
+      { category: "DCT", q: "Which diuretics act at the DCT?", choices: ["Thiazide diuretics", "Loop diuretics only", "Osmotic gas scavengers", "No diuretics act there"], answer: 0, why: "The DCT is listed as the site of action of thiazide diuretics." },
+      { category: "DCT", q: "DCT calcium reabsorption is driven mainly by what hormone?", choices: ["Insulin", "Parathyroid hormone", "Erythropoietin", "ADH only"], answer: 1, why: "The outline states calcium is actively reabsorbed in the DCT under parathyroid hormone influence." },
+      { category: "DCT", q: "Aldosterone in the DCT promotes what pattern?", choices: ["Na+ reabsorption and K+ elimination", "K+ reabsorption and Na+ elimination", "Protein filtration", "Albumin secretion"], answer: 0, why: "The DCT fine-tunes sodium reabsorption and potassium elimination under aldosterone." },
+      { category: "Collecting Duct", q: "ADH increases collecting duct water permeability by causing insertion of what channels?", choices: ["Aquaporin-2 channels", "Voltage-gated sodium channels", "Hemoglobin channels", "Urease channels"], answer: 0, why: "ADH binds vasopressin receptors and causes aquaporin-2 water channels." },
+      { category: "Renal Blood Flow", q: "Kidneys receive about what fraction of cardiac output?", choices: ["2% to 5%", "10%", "20% to 25%", "60%"], answer: 2, why: "The outline states kidneys get about 20% to 25% of cardiac output." },
+      { category: "JGA", q: "Which JGA cells monitor sodium chloride in distal tubular filtrate?", choices: ["Macula densa cells", "Podocytes", "Mesangial matrix cells only", "Red blood cells"], answer: 0, why: "Macula densa cells are specialized DCT cells that monitor sodium chloride concentration." },
+      { category: "JGA", q: "Juxtaglomerular cells are specialized cells of which structure and contain what?", choices: ["Afferent arteriole; renin", "Collecting duct; ADH", "Ureter; urea", "Bladder; creatinine"], answer: 0, why: "JG cells are specialized afferent arteriole cells and contain renin." },
+      { category: "Urinalysis", q: "A urine specific gravity close to 1.000 suggests what?", choices: ["Very concentrated urine", "Dilute urine", "Large protein loss", "Guaranteed renal failure"], answer: 1, why: "Specific gravity closer to 1.000 indicates dilute urine." },
+      { category: "Urinalysis", q: "Healthy kidneys can produce concentrated urine around what specific gravity range?", choices: ["1.000 to 1.005", "1.010 to 1.015", "1.030 to 1.040", "2.000 to 3.000"], answer: 2, why: "The outline lists concentrated urine around 1.030 to 1.040." },
+      { category: "Urinalysis", q: "Urobilinogen is a breakdown product of what?", choices: ["Hemoglobin", "Creatinine", "Phosphate", "Albumin"], answer: 0, why: "Urobilinogen is produced from hemoglobin breakdown." },
+      { category: "Urinalysis", q: "High urobilinogen can suggest what process?", choices: ["RBCs breaking down too quickly", "No hemoglobin turnover", "Low urine pH only", "Ureteral obstruction only"], answer: 0, why: "The outline connects high urobilinogen with rapid RBC breakdown, such as hemolytic anemia." },
+      { category: "Urinalysis", q: "Leukocyte esterase indirectly detects what in urine?", choices: ["White blood cells", "Glucose transport maximum", "Serum creatinine", "Albumin oncotic pressure"], answer: 0, why: "Leukocyte esterase is used as an indirect marker of WBCs and can point toward UTI." },
+      { category: "Urinalysis", q: "A positive dipstick for blood may represent which finding?", choices: ["Only intact RBCs, never anything else", "Intact RBCs, lysed RBCs, or myoglobin", "Only bilirubin", "Only calcium oxalate stones"], answer: 1, why: "The dipstick looks for blood pigment, so it can reflect intact RBCs, lysed RBCs, or myoglobin." },
+      { category: "Renal Failure Labs", q: "Which serum findings increase in renal failure?", choices: ["K+, phosphate, BUN, and creatinine", "pH, calcium, and bicarbonate", "Only albumin and calcium", "Only sodium and glucose"], answer: 0, why: "The outline states K+, phosphate, BUN, and creatinine increase in renal failure." },
+      { category: "Renal Failure Labs", q: "Which serum findings decrease in renal failure?", choices: ["Serum pH, Ca2+, and HCO3-", "BUN and creatinine", "Potassium and phosphate", "Urea and uric acid only"], answer: 0, why: "Serum pH, calcium, and bicarbonate levels decrease in renal failure." },
+      { category: "Creatinine", q: "If serum creatinine doubles, what has generally happened to GFR?", choices: ["GFR has doubled", "GFR has fallen by half", "GFR is unchanged", "GFR is no longer related to creatinine"], answer: 1, why: "Creatinine is used to estimate kidney function; the outline states if creatinine doubles, GFR has fallen by half." },
+      { category: "Obstruction", q: "Lower urinary tract obstruction is classified as obstruction located where?", choices: ["Below the ureterovesical junction", "Above the ureterovesical junction", "Only inside the renal cortex", "Only in the renal pyramids"], answer: 0, why: "The outline classifies lower urinary tract obstruction as below the ureterovesical junction and often bilateral." },
+      { category: "Obstruction", q: "Upper urinary tract obstruction usually produces what pattern?", choices: ["Unilateral findings", "Always bilateral findings", "No hydronephrosis risk", "Only bladder outlet symptoms"], answer: 0, why: "The outline classifies upper obstruction as above the ureterovesical junction and associated with unilateral findings." },
+      { category: "Obstruction", q: "Which effect can urinary obstruction cause?", choices: ["Urine stasis, infection risk, hydronephrosis, and renal tissue atrophy", "Permanent increase in GFR", "Immediate protein-free urine", "Elimination of calculi risk"], answer: 0, why: "Obstruction causes stasis, concern for infection, progressive collecting-system dilation, and possible atrophy." },
+      { category: "Renal Calculi", q: "Which stone type forms only in alkaline urine with urease-positive bacteria?", choices: ["Uric acid stones", "Calcium stones", "Struvite stones", "Cystine stones"], answer: 2, why: "Magnesium ammonium phosphate, or struvite, stones form in alkaline urine with urease-producing bacteria." },
+      { category: "Renal Calculi", q: "Uric acid stones are associated with which factors?", choices: ["Increased BMI, low urine pH, and gout", "Alkaline urine with urease bacteria", "Childhood cystine transport defects only", "High urine pH and low BMI only"], answer: 0, why: "The outline links uric acid stones with increased BMI, low urine pH, and gout." },
+      { category: "Renal Calculi", q: "Cystine stones are best described as what?", choices: ["Common adult stones caused by calcium", "Rare in adults but important in childhood calculi due to genetic cystine transport defects", "Only caused by alkaline urine bacteria", "Always caused by gout"], answer: 1, why: "Cystine stones are rare in adults but represent a significant proportion of childhood stones due to genetic transport defects." },
+      { category: "Renal Calculi", q: "Renal calculi are the most common cause of what?", choices: ["Upper urinary tract obstruction", "Lower urinary tract obstruction", "Nephrotic syndrome", "Renal anemia"], answer: 0, why: "The outline states renal calculi, or nephrolithiasis, are the most common cause of upper urinary tract obstruction." },
+      { category: "Renal Calculi", q: "Renal colic is best described as what?", choices: ["Acute, intermittent, excruciating flank and upper outer abdominal pain", "Painless proteinuria", "Gradual edema around the eyes", "Chronic bone tenderness only"], answer: 0, why: "Renal colic is acute, intermittent, excruciating pain from squeezing of the collecting system or ureter." },
+      { category: "Hydronephrosis", q: "Hydronephrosis means what?", choices: ["Urine-filled dilation of the renal pelvis and calyces with progressive atrophy due to outflow obstruction", "A primary nephrotic disease of podocytes", "White blood cells in urine", "Renal artery stenosis only"], answer: 0, why: "Hydronephrosis is dilation of the renal pelvis and calyces associated with progressive kidney atrophy from obstruction." },
+      { category: "Hydronephrosis", q: "Hydroureter occurs when obstruction is where?", choices: ["Distal ureter", "Glomerular basement membrane", "Proximal convoluted tubule", "Macula densa"], answer: 0, why: "The outline notes hydroureter as ureter dilation from the same obstruction, especially distal ureter obstruction." },
+      { category: "Hydronephrosis", q: "What urinary finding is expected with bilateral obstruction?", choices: ["Oliguria", "Polycythemia", "Hyperfiltration only", "High urobilinogen only"], answer: 0, why: "The outline states oliguria is present if obstruction is bilateral." },
+      { category: "Renal Terms", q: "Azotemia means what?", choices: ["Increased serum nitrogen levels, usually from high urea and creatinine", "White blood cells in urine", "Protein above 3.5 g/day", "Infection of renal pelvis only"], answer: 0, why: "Azotemia is increased serum nitrogen levels, commonly from elevated urea and creatinine." },
+      { category: "Renal Terms", q: "Renal insufficiency refers to a decline in function to about what level?", choices: ["About 75% normal function", "About 50% normal function", "About 25% normal function or GFR 25-30 mL/min", "Zero urine output only"], answer: 2, why: "The outline defines renal insufficiency as about 25% of normal function or a GFR of 25-30 mL/min." },
+      { category: "CKD Definition", q: "CKD is defined as kidney abnormality for at least 3 months or what GFR threshold?", choices: ["GFR > 125 mL/min", "GFR < 60 mL/min/1.73 m2", "GFR exactly 100 mL/min", "GFR < 5 mL/min only"], answer: 1, why: "CKD requires at least 3 months of structural/functional abnormality or GFR below 60 mL/min/1.73 m2." },
+      { category: "Renal Syndromes", q: "Nephritic syndrome is hallmarked by what?", choices: ["Blood and protein loss under the nephrotic range", "Proteinuria greater than 3.5 g/day only", "No hematuria ever", "Only hypercalcemia"], answer: 0, why: "Nephritic syndrome is marked by blood and protein, usually less than 2 g/day of protein." },
+      { category: "Renal Syndromes", q: "Nephrotic syndrome is hallmarked by what?", choices: ["Proteinuria greater than 3.5 g/day", "No edema", "Only red blood cells with no protein", "Only pyuria"], answer: 0, why: "Nephrotic syndrome features large protein loss, classically greater than 3.5 g/day." },
+      { category: "Nephrotic Syndrome", q: "What is the most prominent feature of nephrotic syndrome in the outline?", choices: ["Edema", "Bronchospasm", "Renal colic", "High fever with CVA tenderness"], answer: 0, why: "Edema is the most prominent feature and may begin around the eyes and legs before becoming generalized." },
+      { category: "Nephrotic Syndrome", q: "Which complication can be the first indication of nephrotic syndrome?", choices: ["Thrombotic event such as DVT or pulmonary embolus", "Hydroureter", "Appendicitis", "Respiratory alkalosis only"], answer: 0, why: "The outline notes DVT or pulmonary embolus may be a first indication due to thrombotic consequences." },
+      { category: "Pyelonephritis", q: "Pyelonephritis is an infection of what?", choices: ["Renal pelvis and interstitium", "Only the glomerular basement membrane", "Only the bladder trigone", "Only the collecting duct aquaporins"], answer: 0, why: "Pyelonephritis is an infection of the renal pelvis and interstitium, often ascending from UTI." },
+      { category: "Glomerulonephritis", q: "Glomerulonephritis is most often triggered by what kind of process in the outline?", choices: ["Immune-mediated process", "Purely mechanical ureter blockage", "ADH excess only", "Low urine specific gravity only"], answer: 0, why: "The outline states the triggering event is often immune-mediated." },
+      { category: "Glomerulonephritis", q: "Which immune mechanisms can cause glomerular injury?", choices: ["Antibodies against fixed glomerular antigens or trapped circulating immune complexes", "Only low calcium intake", "Only loss of ADH receptors", "Only bladder outlet obstruction"], answer: 0, why: "The outline lists fixed-antigen antibody reactions and circulating antigen-antibody complexes trapped in the glomerular membrane." },
+      { category: "Glomerular Injury", q: "Basement membrane thickening is described as what type of glomerular injury pattern?", choices: ["Proliferative", "Membranous", "Sclerotic only", "Prerenal"], answer: 1, why: "Basement membrane thickening is the membranous pattern." },
+      { category: "Glomerular Injury", q: "Sclerosis means what in glomerular injury?", choices: ["Increased extracellular material", "Deposition of collagen fibers only", "Loss of all sodium", "Acute UTI"], answer: 0, why: "The outline defines sclerosis as increased extracellular material; fibrosis is collagen deposition." },
+      { category: "Post-Infectious GN", q: "Acute post-infectious glomerulonephritis is classically associated with what organism group?", choices: ["Group A beta-hemolytic streptococci", "Candida only", "Urease-positive Proteus only", "Mycobacterium tuberculosis only"], answer: 0, why: "Certain strains of group A beta-hemolytic streptococci are highlighted." },
+      { category: "Post-Infectious GN", q: "Which manifestation supports acute post-infectious GN?", choices: ["Oliguria, proteinuria, hematuria, cola-colored urine, and elevated ASO titer", "Only painless polyuria", "Only isolated hypercalcemia", "Only low urobilinogen"], answer: 0, why: "The outline lists oliguria, leaky swollen glomerular capillaries, proteinuria, hematuria, cola-colored urine, and elevated ASO." },
+      { category: "IgA Nephropathy", q: "IgA nephropathy is characterized by deposits where?", choices: ["Mesangium", "Ureteral lumen", "Bladder outlet", "Renal papilla only"], answer: 0, why: "Berger disease involves IgA-containing immune complex deposition in the mesangium." },
+      { category: "IgA Nephropathy", q: "IgA nephropathy may present with hematuria after what preceding symptoms?", choices: ["Upper respiratory or gastrointestinal tract symptoms", "Bone fractures only", "Hypervolemia only", "Anesthesia scavenging failure"], answer: 0, why: "The outline notes gross hematuria can be preceded by URI or GI symptoms." },
+      { category: "HSP Nephritis", q: "Henoch-Schonlein purpura nephritis is associated with which features?", choices: ["Purpuric rash, arthritis/arthralgia, abdominal pain, and renal involvement", "Only gout and low urine pH", "Only severe hypertension", "Only nephrolithiasis"], answer: 0, why: "HSP is a small-vessel vasculitis causing lower-extremity purpura, joint symptoms, abdominal pain, and possible renal involvement." },
+      { category: "Lupus Nephritis", q: "SLE glomerulonephritis is characterized by antibodies against what?", choices: ["Nuclear antigens", "Urease enzymes", "Cystine transporters only", "Aquaporin-2 channels only"], answer: 0, why: "Lupus nephritis involves antibodies against nuclear antigens and immune complex formation." },
+      { category: "Lupus Nephritis", q: "Which antibody is associated with SLE in the outline?", choices: ["ANA", "ASO only", "IgE only", "Anti-urease antibody"], answer: 0, why: "The outline specifically notes ANA antibody in SLE." },
+      { category: "Diabetic Nephropathy", q: "What is the primary insult in diabetic nephropathy?", choices: ["Hyperglycemia", "Hypokalemia", "Low BMI", "ADH deficiency only"], answer: 0, why: "Hyperglycemia is listed as the primary insult." },
+      { category: "Diabetic Nephropathy", q: "Nodular deposits in diabetic nephropathy are called what?", choices: ["Kimmelstiel-Wilson syndrome", "Fanconi syndrome", "Nutcracker syndrome", "Henoch-Schonlein syndrome"], answer: 0, why: "The outline links nodular deposits with Kimmelstiel-Wilson syndrome." },
+      { category: "Minimal Change", q: "Minimal change disease mainly affects which structure?", choices: ["Podocyte foot processes", "Ureterovesical junction", "Bladder outlet", "Renal artery wall only"], answer: 0, why: "Minimal change disease shows loss of podocyte foot processes despite minimal light microscopic change." },
+      { category: "Minimal Change", q: "Minimal change disease is mainly seen in whom and causes what syndrome pattern?", choices: ["Children; primary nephrotic disease", "Older adults; postrenal AKI", "Only diabetics; nephritic syndrome", "Only patients with stones; renal colic"], answer: 0, why: "It is mainly in children and is a primary nephrotic disease with heavy protein loss." },
+      { category: "Hypertensive Nephrosclerosis", q: "Hypertensive nephrosclerosis causes what renal vascular change?", choices: ["Sclerotic narrowing of arterioles and small arteries with scarring", "IgA deposits in mesangium only", "Cystine transport failure", "Aquaporin-2 insertion"], answer: 0, why: "Hypertension causes benign nephrosclerosis with narrowed arterioles, scarring, decreased nephron flow, and interstitial fibrosis." },
+      { category: "Tubulointerstitial", q: "Acute tubular injury/necrosis is the most common cause of what?", choices: ["AKI in hospitalized patients", "Nephrotic syndrome in children", "Upper urinary obstruction", "Struvite stones"], answer: 0, why: "ATI/ATN is listed as the most common cause of AKI in hospitalized patients." },
+      { category: "Tubulointerstitial", q: "Major causes of ATI/ATN include what?", choices: ["Ischemia such as hypotension/sepsis and nephrotoxins such as myoglobin", "Only low urine pH", "Only urease-positive bacteria", "Only IgA immune complexes"], answer: 0, why: "The outline lists ischemia and nephrotoxins as major causes." },
+      { category: "RTA", q: "Renal tubular acidosis involves defects in what processes?", choices: ["Bicarbonate reabsorption or hydrogen ion excretion", "Glomerular blood cell filtration only", "Ureteral peristalsis only", "Creatinine production only"], answer: 0, why: "RTA results from impaired reabsorption of bicarbonate ions or excretion of H+." },
+      { category: "RTA", q: "Proximal RTA is also known as which type and is often part of what syndrome?", choices: ["Type 2; Fanconi syndrome", "Type 1; lupus nephritis", "Type 4; nephrotic syndrome", "Type 3; renal colic"], answer: 0, why: "Proximal RTA is Type 2 and commonly occurs as part of Fanconi syndrome." },
+      { category: "RTA", q: "Distal RTA results from what defect and causes what pattern?", choices: ["Distal H+ secretion defect with hypokalemia and hyperchloremic metabolic acidosis", "Proximal glucose hyperreabsorption with alkalosis", "Ureteral obstruction with hydroureter", "Podocyte loss with heavy proteinuria"], answer: 0, why: "Distal Type 1 RTA is a distal H+ secretion defect causing significant acidosis, hypokalemia, and hyperchloremic metabolic acidosis." },
+      { category: "Pyelonephritis", q: "Acute pyelonephritis commonly presents with what?", choices: ["Abrupt chills, high fever, and costovertebral angle ache or tenderness", "Painless foamy urine only", "Only low ASO titer", "Only hypocalcemia"], answer: 0, why: "Acute pyelonephritis has abrupt chills, high fever, and CVA ache or tenderness; urinary symptoms can occur too." },
+      { category: "Pyelonephritis", q: "Chronic pyelonephritis is associated with what pathologic changes?", choices: ["Scarring and deformation of renal calyces and pelvis", "Normal calyces with no scarring", "Only glomerular IgA deposits", "Only kidney enlargement from diabetes"], answer: 0, why: "Chronic pyelonephritis involves bacterial infection with obstruction and scarring/deformation of the calyces and pelvis." },
+      { category: "CKD Causes", q: "What are the two main causes of CKD in the United States listed in the outline?", choices: ["Hypertension and diabetic nephropathy", "Struvite stones and cystine stones", "Pyuria and leukocyte esterase", "ADH and aldosterone"], answer: 0, why: "The outline lists hypertension and diabetic nephropathy as the two main causes of CKD in the United States." },
+      { category: "CKD Progression", q: "Regardless of cause, CKD progressively impairs what kidney functions?", choices: ["Glomerular filtration, tubular reabsorptive capacity, and endocrine functions", "Only bladder storage", "Only ureteral peristalsis", "Only urine color"], answer: 0, why: "CKD causes progressive deterioration of filtration, tubular reabsorption, and endocrine functions such as vitamin D and EPO production." },
+      { category: "Tracking CKD", q: "eGFR uses serum creatinine and adjusts for what?", choices: ["Age, sex, and body size", "Only urine pH", "Only ASO titer", "Only hemoglobin level"], answer: 0, why: "eGFR uses serum creatinine concentration adjusted for age, sex, and body size." },
+      { category: "Tracking CKD", q: "Which ACR range is microalbuminuria?", choices: ["Less than 30 mg/g", "30-300 mg/g", "Greater than 300 mg/g", "Exactly 0 mg/g"], answer: 1, why: "Albumin-to-creatinine ratio of 30-300 mg/g is microalbuminuria." },
+      { category: "CKD Manifestations", q: "Azotemia in CKD means accumulation of what main nitrogenous wastes?", choices: ["Urea and creatinine", "Calcium and phosphate only", "Albumin and hemoglobin", "ADH and aldosterone"], answer: 0, why: "Urea and creatinine are the main nitrogenous compounds that accumulate." },
+      { category: "CKD Manifestations", q: "Uremia differs from azotemia because uremia includes what?", choices: ["Signs and symptoms affecting most organs", "Only a lab increase in nitrogen", "Only one kidney stone", "Only low urine specific gravity"], answer: 0, why: "Uremia includes signs and symptoms across organ systems, not just elevated nitrogenous waste levels." },
+      { category: "CKD Electrolytes", q: "An early symptom of kidney damage related to fluid handling can be what?", choices: ["Polyuria with urine almost isotonic with plasma", "Immediate anuria in all patients", "Severe hypercalcemia", "Only renal colic"], answer: 0, why: "The outline states early kidney damage can cause polyuria with almost isotonic urine." },
+      { category: "CKD Sodium", q: "As CKD progresses, sodium regulation becomes poor. What can too little sodium intake cause?", choices: ["Hypovolemia and decreased GFR", "Immediate hypervolemia only", "Increased calcitriol only", "Nephrotic proteinuria"], answer: 0, why: "Patients may not hold sodium well, so low intake can cause hypovolemia and decreased GFR." },
+      { category: "CKD Potassium", q: "Potassium restriction is generally not needed until GFR is below what threshold?", choices: ["60 mL/min/1.73 m2", "30 mL/min/1.73 m2", "15 mL/min/1.73 m2", "125 mL/min/1.73 m2"], answer: 2, why: "The outline states potassium restriction is generally not needed until GFR is less than 15 mL/min/1.73 m2." },
+      { category: "CKD Acid Base", q: "Why are CKD patients prone to acidosis with high acid load or bicarbonate loss?", choices: ["Kidneys have diminished ability to secrete H+ and reabsorb bicarbonate", "They overproduce aquaporin-2", "Their ureters absorb too much sodium", "They cannot make urobilinogen"], answer: 0, why: "CKD reduces H+ secretion and bicarbonate reabsorption, so acid load or bicarbonate loss can cause acidosis." },
+      { category: "CKD Bone", q: "What phosphate and calcium pattern is typical in CKD mineral disorder?", choices: ["Hyperphosphatemia and hypocalcemia", "Hypophosphatemia and hypercalcemia", "Both calcium and phosphate are always low", "Both calcium and phosphate are always high"], answer: 0, why: "Impaired phosphate excretion causes hyperphosphatemia, and calcium tends to fall." },
+      { category: "CKD Bone", q: "Low calcitriol in CKD contributes to what endocrine response?", choices: ["Secondary hyperparathyroidism", "Primary adrenal failure", "Insulin deficiency", "Thyroid storm"], answer: 0, why: "Calcitriol normally inhibits PTH; when calcitriol is low, PTH rises further." },
+      { category: "CKD Bone", q: "Renal osteodystrophy can lead to which manifestations?", choices: ["Bone tenderness, fractures, and muscle weakness", "Only pyuria", "Only renal colic", "Only ASO elevation"], answer: 0, why: "CKD bone disease can cause tenderness, fractures, and muscle weakness." },
+      { category: "CKD Anemia", q: "If GFR falls below what threshold should patients be evaluated for anemia?", choices: ["60 mL/min/1.73 m2", "125 mL/min", "180 mg/dL", "3 mL/min"], answer: 0, why: "The outline says evaluate for anemia when GFR is less than 60 mL/min/1.73 m2." },
+      { category: "CKD Anemia", q: "A major cause of anemia in CKD is what?", choices: ["Decreased erythropoietin production by kidneys", "Excessive aquaporin-2 production", "Too much urease", "Increased cystine transport"], answer: 0, why: "CKD decreases kidney erythropoietin production, reducing RBC production." },
+      { category: "CKD Other", q: "CKD can cause or worsen hypertension through which mechanisms?", choices: ["Increased RAAS, hypernatremia/hypervolemia, and increased SVR", "Only low urobilinogen", "Only decreased ASO", "Only cystine stones"], answer: 0, why: "The outline lists RAAS activation, sodium/fluid excess, and increased systemic vascular resistance." },
+      { category: "CKD Other", q: "Why can some albumin-bound drugs circulate higher in CKD?", choices: ["Albuminuria reduces binding reserve", "The kidney produces more drug", "Ureter obstruction activates drugs", "Macula densa cells metabolize drugs"], answer: 0, why: "The outline notes drugs that bind albumin tend to circulate higher because of albuminuria." },
+      { category: "AKI", q: "AKI is best described as what?", choices: ["Rapid kidney function decline over hours to a day that may be reversible", "Kidney abnormality lasting at least 3 months only", "Permanent ESRD by definition", "Only nephrotic proteinuria"], answer: 0, why: "AKI is a rapid decline in function over hours or a day and can be reversible if causes are corrected before permanent damage." },
+      { category: "AKI", q: "The three major AKI categories are what?", choices: ["Prerenal, intrarenal, and postrenal", "Nephritic, nephrotic, and pyuric", "Cortical, medullary, and bladder", "Acidic, alkaline, and neutral"], answer: 0, why: "The outline divides AKI into prerenal, intrarenal/intrinsic, and postrenal." },
+      { category: "Prerenal AKI", q: "Which is a prerenal AKI cause?", choices: ["Hypovolemia from hemorrhage, dehydration, GI loss, or burns", "Bilateral ureteral obstruction only", "Bladder cancer only", "Cystine transporter mutation"], answer: 0, why: "Prerenal AKI is caused by reduced perfusion, including hypovolemia from hemorrhage, dehydration, GI losses, or burns." },
+      { category: "Prerenal AKI", q: "Which shock state can contribute to prerenal AKI by decreasing vascular filling?", choices: ["Anaphylactic or septic shock", "Only renal colic", "Only minimal change disease", "Only high urine pH"], answer: 0, why: "The outline lists anaphylactic shock and septic shock under decreased vascular filling." },
+      { category: "Intrarenal AKI", q: "Which is an intrarenal AKI cause?", choices: ["Acute tubular necrosis from prolonged ischemia or nephrotoxins", "Bladder outlet obstruction only", "Bilateral ureteral obstruction only", "Renal pelvis dilation only"], answer: 0, why: "Intrarenal AKI includes ATN from prolonged ischemia and exposure to nephrotoxic drugs, metals, and solvents." },
+      { category: "Intrarenal AKI", q: "Intrarenal obstruction can result from casts or pigments such as what?", choices: ["Hemoglobinuria, myoglobinuria, myeloma light chains, or uric acid casts", "Only urobilinogen", "Only sodium chloride", "Only leukocyte esterase"], answer: 0, why: "The outline lists intratubular obstruction from hemoglobinuria, myoglobinuria, myeloma light chains, or uric acid casts." },
+      { category: "Postrenal AKI", q: "Which is a postrenal AKI cause?", choices: ["Bilateral ureteral obstruction or bladder outlet obstruction", "Hypovolemia from burns", "Reduced EPO production", "Podocyte foot process loss"], answer: 0, why: "Postrenal AKI includes bilateral ureteral obstruction and bladder outlet obstruction such as prostate enlargement or bladder cancer." },
+      { category: "Recognizing AKI", q: "What is an early indicator of AKI, especially prerenal causes?", choices: ["Oliguria", "Frothy urine only", "High ACR only", "Bone tenderness"], answer: 0, why: "Careful observation of urine output is important; oliguria is an early indicator, especially in prerenal causes." },
+      { category: "Recognizing AKI", q: "Why can BUN and creatinine be delayed indicators of AKI?", choices: ["They lag relative to injury", "They rise before injury occurs", "They are unrelated to kidney function", "They only measure calcium"], answer: 0, why: "The outline states BUN and creatinine lag relative to injury, with creatinine affected by hemodynamics and urea production delayed/inconsistent." }
+    ];
+
+    let deck = [...questions];
+    let current = 0;
+    let answers = Array(deck.length).fill(null);
+
+    const scoreCard = document.getElementById('scoreCard');
+    const categoryEl = document.getElementById('category');
+    const counterEl = document.getElementById('counter');
+    const questionEl = document.getElementById('question');
+    const choicesEl = document.getElementById('choices');
+    const feedbackEl = document.getElementById('feedback');
+    const progressText = document.getElementById('progressText');
+    const progressBar = document.getElementById('progressBar');
+    const correctStat = document.getElementById('correctStat');
+    const wrongStat = document.getElementById('wrongStat');
+    const reviewList = document.getElementById('reviewList');
+    const quizContent = document.getElementById('quizContent');
+    const finalScreen = document.getElementById('finalScreen');
+    const finalScore = document.getElementById('finalScore');
+    const finalCopy = document.getElementById('finalCopy');
+
+    function counts() {
+      const answered = answers.filter(answer => answer !== null).length;
+      const correct = answers.filter((answer, i) => answer === deck[i].answer).length;
+      const wrong = answers.filter((answer, i) => answer !== null && answer !== deck[i].answer).length;
+      return { answered, correct, wrong };
+    }
+
+    function render() {
+      const item = deck[current];
+      const picked = answers[current];
+      categoryEl.textContent = item.category;
+      counterEl.textContent = `Question ${current + 1} / ${deck.length}`;
+      questionEl.textContent = item.q;
+      choicesEl.replaceChildren();
+
+      item.choices.forEach((choice, i) => {
+        const button = document.createElement('button');
+        button.className = 'choice';
+        if (picked !== null && i === item.answer) button.classList.add('correct');
+        if (picked !== null && i === picked && picked !== item.answer) button.classList.add('wrong');
+        button.dataset.i = i;
+        button.disabled = picked !== null;
+
+        const letter = document.createElement('span');
+        letter.className = 'letter';
+        letter.textContent = String.fromCharCode(65 + i);
+
+        const text = document.createElement('span');
+        text.textContent = choice;
+
+        button.append(letter, text);
+        choicesEl.append(button);
+      });
+
+      if (picked === null) {
+        feedbackEl.className = 'feedback';
+        feedbackEl.replaceChildren();
+      } else {
+        const correct = picked === item.answer;
+        feedbackEl.className = 'feedback show';
+        feedbackEl.replaceChildren();
+        const strong = document.createElement('strong');
+        strong.textContent = correct ? 'Correct' : 'Missed';
+        const explanation = document.createElement('div');
+        explanation.textContent = item.why;
+        feedbackEl.append(strong, document.createElement('br'), explanation);
+      }
+
+      const stats = counts();
+      const pct = Math.round((stats.answered / deck.length) * 100);
+      progressText.textContent = `${pct}%`;
+      progressBar.style.width = `${pct}%`;
+      correctStat.textContent = stats.correct;
+      wrongStat.textContent = stats.wrong;
+      scoreCard.innerHTML = `Score: ${stats.correct} / ${deck.length}<br>Answered: ${stats.answered}`;
+      renderReview();
+    }
+
+    function renderReview() {
+      reviewList.replaceChildren();
+      deck.forEach((item, i) => {
+        const li = document.createElement('li');
+        if (i === current) li.classList.add('current');
+        if (answers[i] !== null && answers[i] === item.answer) li.classList.add('correct');
+        if (answers[i] !== null && answers[i] !== item.answer) li.classList.add('wrong');
+        li.dataset.i = i;
+        li.textContent = `${i + 1}. ${item.category}`;
+        reviewList.append(li);
+      });
+    }
+
+    function choose(index) {
+      if (answers[current] !== null) return;
+      answers[current] = index;
+      render();
+      if (answers.every(answer => answer !== null)) {
+        setTimeout(showFinal, 500);
+      }
+    }
+
+    function next() {
+      if (current < deck.length - 1) current += 1;
+      else if (answers.every(answer => answer !== null)) return showFinal();
+      render();
+    }
+
+    function prev() {
+      if (current > 0) current -= 1;
+      render();
+    }
+
+    function showFinal() {
+      const stats = counts();
+      const pct = Math.round((stats.correct / deck.length) * 100);
+      finalScore.textContent = `${pct}%`;
+      finalCopy.textContent = `You answered ${stats.correct} of ${deck.length} correctly. Use review to revisit missed topics, then restart when ready.`;
+      quizContent.classList.add('hide');
+      finalScreen.classList.add('show');
+    }
+
+    function hideFinal() {
+      quizContent.classList.remove('hide');
+      finalScreen.classList.remove('show');
+    }
+
+    function restart(shuffle = false) {
+      if (shuffle) {
+        for (let i = deck.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [deck[i], deck[j]] = [deck[j], deck[i]];
+        }
+      }
+      current = 0;
+      answers = Array(deck.length).fill(null);
+      hideFinal();
+      render();
+    }
+
+    choicesEl.addEventListener('click', event => {
+      const button = event.target.closest('.choice');
+      if (!button) return;
+      choose(Number(button.dataset.i));
+    });
+
+    reviewList.addEventListener('click', event => {
+      const item = event.target.closest('li');
+      if (!item) return;
+      current = Number(item.dataset.i);
+      hideFinal();
+      render();
+    });
+
+    document.getElementById('nextBtn').addEventListener('click', next);
+    document.getElementById('prevBtn').addEventListener('click', prev);
+    document.getElementById('shuffleBtn').addEventListener('click', () => restart(true));
+    document.getElementById('restartBtn').addEventListener('click', () => restart(false));
+    document.getElementById('reviewBtn').addEventListener('click', () => {
+      current = answers.findIndex((answer, i) => answer !== null && answer !== deck[i].answer);
+      if (current < 0) current = 0;
+      hideFinal();
+      render();
+    });
+
+    document.addEventListener('keydown', event => {
+      if (event.key === 'ArrowRight') next();
+      if (event.key === 'ArrowLeft') prev();
+      if (/^[1-4]$/.test(event.key)) choose(Number(event.key) - 1);
+      if (event.key.toLowerCase() === 'r') restart(false);
+    });
+
+    render();
+  </script>
+</body>
+</html>

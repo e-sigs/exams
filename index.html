@@ -87,6 +87,31 @@
       letter-spacing: .09em;
     }
 
+    .quiz-nav {
+      grid-column: 1 / -1;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font: 900 12px/1 "Trebuchet MS", sans-serif;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    .quiz-nav a {
+      border: 2px solid var(--green);
+      border-radius: 999px;
+      padding: 10px 12px;
+      background: rgba(255,249,238,.75);
+      color: var(--green);
+      text-decoration: none;
+      box-shadow: 4px 4px 0 rgba(15,59,47,.22);
+    }
+
+    .quiz-nav a[aria-current="page"] {
+      background: var(--green);
+      color: var(--paper);
+    }
+
     .layout {
       display: grid;
       grid-template-columns: 1fr 300px;
@@ -357,6 +382,10 @@
         <h1>Machine Quiz</h1>
       </div>
       <div class="score-card" id="scoreCard">Score: 0 / 0<br>Answered: 0</div>
+      <nav class="quiz-nav" aria-label="Quiz pages">
+        <a href="./" aria-current="page">Machine Quiz</a>
+        <a href="./renal.html">Renal Outline Quiz</a>
+      </nav>
     </header>
 
     <section class="layout">
