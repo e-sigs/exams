@@ -406,6 +406,7 @@
             <button class="action secondary" id="prevBtn">Previous</button>
             <button class="action" id="nextBtn">Next</button>
             <button class="action gold" id="shuffleBtn">Shuffle & Restart</button>
+            <button class="action secondary" id="sortBtn">Sort Normal</button>
           </div>
         </div>
         <div class="final-screen" id="finalScreen">
@@ -434,7 +435,7 @@
         </div>
         <div class="panel">
           <p class="panel-title">How To Use</p>
-          <p class="final-copy" style="font-size:13px;margin:0">Pick an answer for instant feedback. Use Next to continue. Keyboard shortcuts: 1-4, arrows, R.</p>
+          <p class="final-copy" style="font-size:13px;margin:0">Pick an answer for instant feedback. Use Next to continue. Keyboard shortcuts: 1-4, arrows, R to restart shuffled, S to sort normal.</p>
         </div>
       </aside>
     </section>
@@ -559,7 +560,20 @@
       { category: "Recognizing AKI", q: "Why can BUN and creatinine be delayed indicators of AKI?", choices: ["They lag relative to injury", "They rise before injury occurs", "They are unrelated to kidney function", "They only measure calcium"], answer: 0, why: "The outline states BUN and creatinine lag relative to injury, with creatinine affected by hemodynamics and urea production delayed/inconsistent." }
     ];
 
-    let deck = [...questions];
+    function shuffleDeck(items) {
+      const shuffled = [...items];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      return shuffled;
+    }
+
+    function buildDeck(normalOrder = false) {
+      return normalOrder ? [...questions] : shuffleDeck(questions);
+    }
+
+    let deck = buildDeck();
     let current = 0;
     let answers = Array(deck.length).fill(null);
 
@@ -684,13 +698,8 @@
       finalScreen.classList.remove('show');
     }
 
-    function restart(shuffle = false) {
-      if (shuffle) {
-        for (let i = deck.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [deck[i], deck[j]] = [deck[j], deck[i]];
-        }
-      }
+    function restart(normalOrder = false) {
+      deck = buildDeck(normalOrder);
       current = 0;
       answers = Array(deck.length).fill(null);
       hideFinal();
@@ -713,7 +722,8 @@
 
     document.getElementById('nextBtn').addEventListener('click', next);
     document.getElementById('prevBtn').addEventListener('click', prev);
-    document.getElementById('shuffleBtn').addEventListener('click', () => restart(true));
+    document.getElementById('shuffleBtn').addEventListener('click', () => restart(false));
+    document.getElementById('sortBtn').addEventListener('click', () => restart(true));
     document.getElementById('restartBtn').addEventListener('click', () => restart(false));
     document.getElementById('reviewBtn').addEventListener('click', () => {
       current = answers.findIndex((answer, i) => answer !== null && answer !== deck[i].answer);
@@ -727,6 +737,7 @@
       if (event.key === 'ArrowLeft') prev();
       if (/^[1-4]$/.test(event.key)) choose(Number(event.key) - 1);
       if (event.key.toLowerCase() === 'r') restart(false);
+      if (event.key.toLowerCase() === 's') restart(true);
     });
 
     render();
