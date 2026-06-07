@@ -128,7 +128,7 @@
       border: 3px solid var(--green);
       border-radius: 30px;
       min-height: 610px;
-      padding: clamp(24px, 4vw, 48px);
+      padding: clamp(22px, 3.2vw, 40px);
       background:
         linear-gradient(145deg, rgba(255,255,255,.65), transparent 34%),
         repeating-linear-gradient(0deg, rgba(15,59,47,.055) 0 1px, transparent 1px 22px),
@@ -152,8 +152,11 @@
     .tag-row {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 20px;
+      align-items: center;
+      gap: 10px 12px;
+      margin-bottom: 18px;
+      border-bottom: 2px solid rgba(15,59,47,.18);
+      padding-bottom: 14px;
       font: 900 12px/1 "Trebuchet MS", sans-serif;
       letter-spacing: .13em;
       text-transform: uppercase;
@@ -168,17 +171,22 @@
     }
 
     .question {
-      margin: 0 0 24px;
+      margin: 0 0 22px;
+      border-left: 8px solid var(--gold);
+      border-radius: 18px;
+      padding: 18px 20px;
+      background: rgba(255,249,238,.66);
       color: var(--green);
-      font-size: clamp(28px, 4.5vw, 54px);
-      line-height: .98;
-      letter-spacing: -.045em;
+      font-size: clamp(24px, 3vw, 38px);
+      line-height: 1.08;
+      letter-spacing: -.025em;
       max-width: 900px;
+      text-wrap: pretty;
     }
 
     .choices {
       display: grid;
-      gap: 12px;
+      gap: 14px;
       position: relative;
       z-index: 1;
     }
@@ -186,15 +194,15 @@
     .choice {
       display: grid;
       grid-template-columns: auto 1fr;
-      gap: 13px;
-      align-items: center;
+      gap: 14px;
+      align-items: start;
       width: 100%;
       border: 2px solid var(--green);
       border-radius: 18px;
-      padding: 15px 16px;
-      background: rgba(255,249,238,.72);
+      padding: 16px 18px;
+      background: rgba(255,249,238,.82);
       color: var(--ink);
-      font: 800 16px/1.25 "Trebuchet MS", sans-serif;
+      font: 800 16px/1.38 "Trebuchet MS", sans-serif;
       text-align: left;
       cursor: pointer;
       box-shadow: 5px 5px 0 rgba(15,59,47,.28);
@@ -216,6 +224,7 @@
       place-items: center;
       width: 32px;
       height: 32px;
+      margin-top: 1px;
       border-radius: 50%;
       background: var(--green);
       color: var(--paper);
@@ -261,6 +270,7 @@
 
     button.action.secondary { background: var(--cream); color: var(--green); }
     button.action.gold { background: var(--gold); color: var(--ink); }
+    button.action.active { background: var(--gold); color: var(--ink); }
     aside { display: grid; gap: 14px; }
 
     .panel {
@@ -375,7 +385,86 @@
       .score-card { text-align: left; }
       .quiz-nav { position: static; }
       .quiz-card { min-height: auto; }
+      .question { font-size: clamp(22px, 7vw, 34px); padding: 16px; }
+      .choice { padding: 14px; }
       .review { max-height: 150px; }
+    }
+
+    @media (max-width: 560px) {
+      .shell {
+        width: min(100vw - 18px, 1280px);
+        padding: 10px 0 20px;
+      }
+
+      header { gap: 10px; margin-bottom: 10px; }
+      .eyebrow { margin-bottom: 5px; font-size: 11px; }
+      h1 { font-size: clamp(34px, 11vw, 48px); }
+
+      .score-card {
+        min-width: 0;
+        padding: 10px 12px;
+        font-size: 11px;
+      }
+
+      .score-card,
+      .quiz-nav,
+      .panel {
+        box-shadow: 5px 5px 0 rgba(15,59,47,.7);
+      }
+
+      .layout { gap: 12px; }
+
+      .quiz-nav {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        border-radius: 18px;
+        padding: 8px;
+      }
+
+      .quiz-nav .panel-title { display: none; }
+
+      .quiz-nav a {
+        border-radius: 13px;
+        padding: 9px 7px;
+        box-shadow: none;
+        font-size: 10px;
+        line-height: 1.1;
+        text-align: center;
+        letter-spacing: .06em;
+      }
+
+      .quiz-card {
+        border-radius: 22px;
+        padding: 14px;
+        box-shadow: 6px 6px 0 rgba(15, 59, 47, 0.92), 0 18px 44px rgba(15, 59, 47, 0.18);
+      }
+
+      .tag-row { margin-bottom: 10px; padding-bottom: 10px; }
+      .question { margin-bottom: 12px; line-height: 1.12; }
+      .choices { gap: 10px; }
+
+      .choice {
+        grid-template-columns: 30px 1fr;
+        gap: 10px;
+        border-radius: 15px;
+        font-size: 15px;
+      }
+
+      .letter {
+        width: 30px;
+        height: 30px;
+      }
+
+      .actions {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        margin-top: 14px;
+      }
+
+      button.action { width: 100%; }
+
+      .panel { padding: 14px; }
     }
   </style>
 </head>
@@ -406,7 +495,7 @@
             <button class="action secondary" id="prevBtn">Previous</button>
             <button class="action" id="nextBtn">Next</button>
             <button class="action gold" id="shuffleBtn">Shuffle & Restart</button>
-            <button class="action secondary" id="sortBtn">Sort Normal</button>
+            <button class="action secondary" id="sortBtn">Sort</button>
           </div>
         </div>
         <div class="final-screen" id="finalScreen">
@@ -430,12 +519,20 @@
           </div>
         </div>
         <div class="panel">
+          <p class="panel-title">Question Mode</p>
+          <div class="actions" style="margin-top:0">
+            <button class="action secondary active" id="allModeBtn" aria-pressed="true">All</button>
+            <button class="action secondary" id="easyModeBtn" aria-pressed="false">Easy</button>
+            <button class="action secondary" id="hardModeBtn" aria-pressed="false">Hard</button>
+          </div>
+        </div>
+        <div class="panel">
           <p class="panel-title">Question Map</p>
           <ol class="review" id="reviewList"></ol>
         </div>
         <div class="panel">
           <p class="panel-title">How To Use</p>
-          <p class="final-copy" style="font-size:13px;margin:0">Pick an answer for instant feedback. Use Next to continue. Keyboard shortcuts: 1-4, arrows, R to restart shuffled, S to sort normal.</p>
+          <p class="final-copy" style="font-size:13px;margin:0">Pick All, Easy, or Hard. Use Next to continue. Keyboard shortcuts: 1-4, arrows, R to restart shuffled, S to sort/unsort without restarting.</p>
         </div>
       </aside>
     </section>
@@ -3217,6 +3314,17 @@
       }
 ];
 
+    let activeDifficulty = 'all';
+
+    function questionDifficulty(question) {
+      return question.difficulty || (question.category.startsWith('Advanced') ? 'hard' : 'easy');
+    }
+
+    function questionPool() {
+      if (activeDifficulty === 'all') return questions;
+      return questions.filter(question => questionDifficulty(question) === activeDifficulty);
+    }
+
     function shuffleQuestionChoices(question) {
       const choices = question.choices.map((choice, index) => ({ choice, index }));
       for (let i = choices.length - 1; i > 0; i--) {
@@ -3225,6 +3333,7 @@
       }
       return {
         ...question,
+        originalIndex: question.originalIndex,
         choices: choices.map(item => item.choice),
         answer: choices.findIndex(item => item.index === question.answer)
       };
@@ -3240,12 +3349,14 @@
     }
 
     function buildDeck(normalOrder = false) {
-      const prepared = questions.map(shuffleQuestionChoices);
-      return normalOrder ? prepared : shuffleDeck(prepared);
+      const prepared = questionPool().map((question, originalIndex) => shuffleQuestionChoices({ ...question, originalIndex }));
+      const ordered = normalOrder ? prepared : shuffleDeck(prepared);
+      return ordered.map((question, randomOrder) => ({ ...question, randomOrder }));
     }
 
     let deck = buildDeck();
     let current = 0;
+    let isSorted = false;
     let answers = Array(deck.length).fill(null);
 
     const scoreCard = document.getElementById('scoreCard');
@@ -3263,6 +3374,20 @@
     const finalScreen = document.getElementById('finalScreen');
     const finalScore = document.getElementById('finalScore');
     const finalCopy = document.getElementById('finalCopy');
+    const sortBtn = document.getElementById('sortBtn');
+    const modeButtons = {
+      all: document.getElementById('allModeBtn'),
+      easy: document.getElementById('easyModeBtn'),
+      hard: document.getElementById('hardModeBtn')
+    };
+
+    function updateModeButtons() {
+      Object.entries(modeButtons).forEach(([mode, button]) => {
+        if (mode === activeDifficulty) button.classList.add('active');
+        else button.classList.remove('active');
+        button.ariaPressed = String(mode === activeDifficulty);
+      });
+    }
 
     function counts() {
       const answered = answers.filter(answer => answer !== null).length;
@@ -3274,8 +3399,9 @@
     function render() {
       const item = deck[current];
       const picked = answers[current];
+      const stats = counts();
       categoryEl.textContent = item.category;
-      counterEl.textContent = `Question ${current + 1} / ${deck.length}`;
+      counterEl.textContent = `Answered ${stats.answered} / ${deck.length}`;
       questionEl.textContent = item.q;
       choicesEl.replaceChildren();
 
@@ -3312,13 +3438,15 @@
         feedbackEl.append(strong, document.createElement('br'), explanation);
       }
 
-      const stats = counts();
       const pct = Math.round((stats.answered / deck.length) * 100);
       progressText.textContent = `${pct}%`;
       progressBar.style.width = `${pct}%`;
       correctStat.textContent = stats.correct;
       wrongStat.textContent = stats.wrong;
-      scoreCard.innerHTML = `Score: ${stats.correct} / ${deck.length}<br>Answered: ${stats.answered}`;
+      const modeLabel = activeDifficulty.charAt(0).toUpperCase() + activeDifficulty.slice(1);
+      scoreCard.innerHTML = `${modeLabel} Mode<br>Score: ${stats.correct} / ${deck.length}<br>Answered: ${stats.answered}`;
+      sortBtn.textContent = isSorted ? 'Unsort' : 'Sort';
+      updateModeButtons();
       renderReview();
     }
 
@@ -3369,10 +3497,24 @@
       finalScreen.classList.remove('show');
     }
 
-    function restart(normalOrder = false) {
-      deck = buildDeck(normalOrder);
+    function restart() {
+      deck = buildDeck(false);
       current = 0;
+      isSorted = false;
       answers = Array(deck.length).fill(null);
+      hideFinal();
+      render();
+    }
+
+    function toggleSort() {
+      const currentQuestion = deck[current];
+      const paired = deck.map((question, index) => ({ question, answer: answers[index] }));
+      paired.sort((a, b) => isSorted ? a.question.randomOrder - b.question.randomOrder : a.question.originalIndex - b.question.originalIndex);
+      deck = paired.map(item => item.question);
+      answers = paired.map(item => item.answer);
+      current = deck.findIndex(question => question.originalIndex === currentQuestion.originalIndex);
+      if (current < 0) current = 0;
+      isSorted = !isSorted;
       hideFinal();
       render();
     }
@@ -3393,9 +3535,21 @@
 
     document.getElementById('nextBtn').addEventListener('click', next);
     document.getElementById('prevBtn').addEventListener('click', prev);
-    document.getElementById('shuffleBtn').addEventListener('click', () => restart(false));
-    document.getElementById('sortBtn').addEventListener('click', () => restart(true));
-    document.getElementById('restartBtn').addEventListener('click', () => restart(false));
+    document.getElementById('shuffleBtn').addEventListener('click', restart);
+    sortBtn.addEventListener('click', toggleSort);
+    document.getElementById('restartBtn').addEventListener('click', restart);
+    modeButtons.all.addEventListener('click', () => {
+      activeDifficulty = 'all';
+      restart();
+    });
+    modeButtons.easy.addEventListener('click', () => {
+      activeDifficulty = 'easy';
+      restart();
+    });
+    modeButtons.hard.addEventListener('click', () => {
+      activeDifficulty = 'hard';
+      restart();
+    });
     document.getElementById('reviewBtn').addEventListener('click', () => {
       current = answers.findIndex((answer, i) => answer !== null && answer !== deck[i].answer);
       if (current < 0) current = 0;
@@ -3407,8 +3561,8 @@
       if (event.key === 'ArrowRight') next();
       if (event.key === 'ArrowLeft') prev();
       if (/^[1-4]$/.test(event.key)) choose(Number(event.key) - 1);
-      if (event.key.toLowerCase() === 'r') restart(false);
-      if (event.key.toLowerCase() === 's') restart(true);
+      if (event.key.toLowerCase() === 'r') restart();
+      if (event.key.toLowerCase() === 's') toggleSort();
     });
 
     render();
