@@ -2930,6 +2930,7 @@
       },
       {
             "category": "Advanced Ventilators: Fresh Gas Coupling",
+            "difficulty": "hard",
             "q": "A traditional ventilator couples fresh gas flow to tidal volume. FGF is 4 L/min, I:E is 1:2, RR is 10, and set TV is 500 mL. If compliance loss is already compensated, what approximate TV reaches the patient?",
             "choices": [
                   "633 mL",
@@ -2942,6 +2943,7 @@
       },
       {
             "category": "Advanced Ventilators: Compliance Loss",
+            "difficulty": "hard",
             "q": "A ventilator is set to 600 mL. Circuit compliance is 5 mL/cm H2O and PIP is 25 cm H2O. About how much TV is lost to circuit expansion?",
             "choices": [
                   "125 mL",
@@ -2954,6 +2956,7 @@
       },
       {
             "category": "Advanced Ventilators: Compliance Loss",
+            "difficulty": "hard",
             "q": "Using the same 600 mL setting, 5 mL/cm H2O circuit compliance, and PIP 25 cm H2O, what approximate TV is delivered if the ventilator does not compensate?",
             "choices": [
                   "475 mL",
@@ -2966,114 +2969,176 @@
       },
       {
             "category": "Advanced Ventilators: Fresh Gas Decoupling",
+            "difficulty": "hard",
             "q": "Which finding is expected with fresh gas decoupling during mechanical ventilation?",
             "choices": [
                   "Fresh gas flow is diverted to the reservoir bag during inspiration rather than being added to delivered TV",
                   "Increasing FGF directly increases delivered TV breath-by-breath",
-                  "The oxygen flush valve is routed through the vaporizer",
+                  "The scavenger reservoir determines delivered TV",
                   "The APL valve becomes the primary inspiratory valve"
             ],
             "answer": 0,
-            "why": "Fresh gas decoupling prevents FGF from being added to the delivered tidal volume by diverting FGF to the reservoir bag during inspiration."
+            "why": "Fresh gas decoupling prevents FGF from being added to delivered TV by diverting FGF to the reservoir bag during inspiration."
       },
       {
             "category": "Advanced Ventilators: Fresh Gas Decoupling",
-            "q": "On a machine with fresh gas decoupling, the breathing bag moves with each mechanical breath. What does this usually indicate?",
+            "difficulty": "hard",
+            "q": "On a Drager fresh-gas-decoupled machine, the manual breathing bag moves with each mechanical breath. What does this usually indicate?",
             "choices": [
                   "Normal fresh gas decoupling behavior",
                   "The expiratory valve is missing",
-                  "The vaporizer is overfilled",
+                  "The filter is saturated",
                   "The scavenger vacuum is completely disconnected"
             ],
             "answer": 0,
-            "why": "The lecture notes that with fresh gas decoupling, the manual breathing bag can move with each breath because FGF is directed to the bag during inspiration."
+            "why": "The approved ventilator slides note that with fresh gas decoupling, FGF goes to the breathing bag and the bag moves with each breath."
       },
       {
-            "category": "Advanced Ventilators: Fresh Gas Coupling",
-            "q": "On an older fresh-gas-coupled ventilator, why can increasing FGF be risky in a small pediatric patient?",
+            "category": "Advanced Ventilators: Fresh Gas Compensation",
+            "difficulty": "hard",
+            "q": "How does fresh gas compensation keep delivered TV matched to set TV when FGF changes?",
             "choices": [
-                  "It can increase delivered tidal volume and contribute to barotrauma",
-                  "It always decreases delivered tidal volume",
-                  "It prevents oxygen from reaching the common gas outlet",
-                  "It disables the pressure sensor shutoff valve"
+                  "Volume and flow sensors provide feedback so the ventilator adjusts delivered TV",
+                  "The APL valve opens during every inspiration",
+                  "Fresh gas is always added directly to the patient circuit",
+                  "The oxygen flush valve meters each breath"
             ],
             "answer": 0,
-            "why": "Traditional ventilators may add FGF during inspiration, so higher FGF can raise delivered TV, especially important in pediatrics."
+            "why": "Fresh gas compensation uses volume and flow sensor feedback to adjust delivered tidal volume despite fresh gas flow changes."
       },
       {
             "category": "Advanced Ventilators: Piston Systems",
+            "difficulty": "hard",
             "q": "A piston ventilator entrains room air because pressure in the piston falls too low. Which valve is involved?",
             "choices": [
                   "Negative pressure relief valve",
                   "Oxygen flush valve",
-                  "Pin index valve",
-                  "Vaporizer interlock valve"
+                  "Reservoir bag",
+                  "Scavenger transfer tubing"
             ],
             "answer": 0,
-            "why": "The negative pressure relief valve opens around negative pressure in the piston, entraining room air to prevent NEEP."
+            "why": "The negative pressure relief valve opens when piston pressure declines to about -8 cm H2O, entraining room air to prevent NEEP."
       },
       {
             "category": "Advanced Ventilators: Piston Systems",
-            "q": "Which disadvantage is associated with piston ventilators when flows are too low?",
+            "difficulty": "hard",
+            "q": "A piston ventilator reaches excessive piston pressure. Which statement best matches the approved slide values for positive pressure relief?",
             "choices": [
-                  "Room air entrainment",
-                  "Mandatory use of 100% oxygen drive gas",
-                  "Automatic elimination of all leaks",
-                  "Loss of all pressure relief valves"
+                  "It opens if piston pressure reaches about 75 cm H2O at the highest, with many defaults near 40 cm H2O",
+                  "It opens only at 5 cm H2O",
+                  "It has no positive pressure relief valve",
+                  "It opens only when the reservoir bag is empty"
             ],
             "answer": 0,
-            "why": "The ventilator slides list room air entrainment at very low flow rates as a piston ventilator disadvantage."
+            "why": "The piston ventilator slides list a positive pressure relief valve opening at 75 cm H2O at the highest, with many manufacturers defaulting around 40 cm H2O."
       },
       {
             "category": "Advanced Ventilators: Relief Valve",
+            "difficulty": "hard",
             "q": "Why can using the oxygen flush during the inspiratory phase of mechanical ventilation be dangerous?",
             "choices": [
                   "It can rapidly add high flow directly to the inspiratory limb and cause barotrauma",
                   "It lowers all circuit pressure to room air",
                   "It turns off the ventilator relief valve permanently",
-                  "It forces all gas through the vaporizer"
+                  "It drains the scavenger reservoir"
             ],
             "answer": 0,
-            "why": "The O2 flush delivers high flow directly to the circuit and bypasses buffering components, so activation during inspiration can cause high pressure."
+            "why": "The ventilator relief valve slide warns that O2 flush during inspiration flows directly into the inspiratory limb without buffering the increased flow and pressure."
       },
       {
-            "category": "Advanced Ventilators: Monitoring",
-            "q": "Which alarm combination is specifically listed as a disconnect detection strategy in modern anesthesia ventilators?",
+            "category": "Advanced Ventilators: Drive Gas",
+            "difficulty": "hard",
+            "q": "A Drager machine uses a Venturi device for drive gas. What does that device do?",
             "choices": [
-                  "Low PIP, low exhaled TV, or low exhaled CO2",
-                  "High FiO2, high agent, and high temperature",
-                  "Low vaporizer level, low room humidity, and low suction",
-                  "High cylinder pressure, high pipeline pressure, and high battery"
+                  "Entrains room air as gas speed increases and pressure falls, reducing compressed O2 use",
+                  "Converts waste anesthetic gas into oxygen",
+                  "Routes all fresh gas through the scavenger",
+                  "Prevents the bellows from refilling"
             ],
             "answer": 0,
-            "why": "The ventilator PDF lists at least three disconnect alarms: low PIP, low exhaled tidal volume, or low exhaled CO2."
+            "why": "The Venturi device entrains room air because pressure is lowest at the narrowing where gas speed is greatest, reducing compressed oxygen use."
+      },
+      {
+            "category": "Advanced Ventilators: Drive Gas Leak",
+            "difficulty": "hard",
+            "q": "A drive gas leak into the bellows would be expected to cause which pattern?",
+            "choices": [
+                  "Hyperventilation, possible barotrauma, increased FiO2, decreased N2O, and diluted inhalational agent",
+                  "Guaranteed hypoventilation with increased N2O",
+                  "Immediate absorber exhaustion only",
+                  "No change in delivered gases"
+            ],
+            "answer": 0,
+            "why": "The ventilator slides list these consequences when drive gas leaks into the bellows."
+      },
+      {
+            "category": "Advanced Ventilators: Spill Valve",
+            "difficulty": "hard",
+            "q": "If a pneumatic ventilator spill valve is stuck closed at end-expiration, what problem is expected?",
+            "choices": [
+                  "More than the usual 2-3 cm H2O of PEEP can occur in the circuit",
+                  "The bellows cannot ever fill because all gas goes to the scavenger",
+                  "Fresh gas flow is blocked at the flowmeters",
+                  "The Bain inner tube becomes occluded"
+            ],
+            "answer": 0,
+            "why": "The approved ventilator slides state that if the spill valve is stuck closed, more than 2-3 cm H2O of PEEP will occur."
       },
       {
             "category": "Advanced Scavenging: Safety",
-            "q": "If the scavenger disposal tubing becomes occluded, which safety feature protects the patient and equipment from pressure buildup?",
+            "difficulty": "hard",
+            "q": "Excessive positive pressure develops in a scavenging system after evacuation tubing is kinked. What immediate action from the lecture can relieve the problem during the case?",
             "choices": [
-                  "Positive pressure relief valve",
-                  "Negative pressure relief valve",
-                  "Pin index safety system",
-                  "Second-stage regulator"
+                  "Check for occlusion or quickly remove the scavenger transfer tubing",
+                  "Close the APL valve completely",
+                  "Increase central vacuum to maximum without checking valves",
+                  "Place the transfer tubing on the floor"
             ],
             "answer": 0,
-            "why": "The positive pressure relief valve vents excess pressure if the scavenging system is occluded."
+            "why": "The scavenger clinical issues slide advises checking for occlusion or quickly removing scavenger transfer tubing when excessive positive pressure occurs."
       },
       {
-            "category": "Advanced Scavenging: Safety",
-            "q": "In an active scavenging system, excessive suction is limited mainly by which feature?",
+            "category": "Advanced Scavenging: Excessive Suction",
+            "difficulty": "hard",
+            "q": "Why can excessive active scavenger suction create misleading ventilation information?",
             "choices": [
-                  "Negative pressure relief valve admitting room air",
-                  "Oxygen flush valve closing automatically",
-                  "The vaporizer interlock opening",
-                  "Cylinder check valves leaking backward"
+                  "It can draw room air before patient gas, masking disconnections and affecting expired volume readings",
+                  "It increases inspired anesthetic concentration",
+                  "It guarantees the reservoir bag is full",
+                  "It prevents negative pressure relief valve function by design"
             ],
             "answer": 0,
-            "why": "The negative pressure relief valve limits subatmospheric pressure by allowing room air into the scavenger interface."
+            "why": "The excessive suction slide notes that scavenging may draw room air before patient gas, masking disconnections and affecting expired volume readings."
+      },
+      {
+            "category": "Advanced Scavenging: Open Interface",
+            "difficulty": "hard",
+            "q": "Which combination best describes an open scavenger interface?",
+            "choices": [
+                  "Open to atmosphere through holes, low overpressure risk, commonly active, and suction required",
+                  "Sealed, high overpressure risk, no suction ever, and no reservoir",
+                  "Closed to atmosphere and only passive",
+                  "Part of the patient inspiratory limb"
+            ],
+            "answer": 0,
+            "why": "The approved scavenger slides describe open interfaces as newer, open to atmosphere, low overpressure risk, commonly active, and suction-required."
+      },
+      {
+            "category": "Advanced Scavenging: Closed Interface",
+            "difficulty": "hard",
+            "q": "Which safety tradeoff best describes a closed scavenger interface?",
+            "choices": [
+                  "It captures gases efficiently but has high overpressure risk relieved by valves and requires monitoring/adjustment",
+                  "It has no pressure relief valves and cannot capture gases",
+                  "It is open to atmosphere and therefore cannot overpressurize",
+                  "It replaces the gas collection assembly"
+            ],
+            "answer": 0,
+            "why": "Closed interfaces are sealed and efficient at gas capture, but overpressure risk is high and must be relieved by valves."
       },
       {
             "category": "Advanced Scavenging: Active Systems",
+            "difficulty": "hard",
             "q": "Why must unused ports on an active scavenger manifold be capped?",
             "choices": [
                   "To prevent room air intake or waste gas leakage",
@@ -3086,6 +3151,7 @@
       },
       {
             "category": "Advanced Scavenging: Leaks",
+            "difficulty": "hard",
             "q": "A breathing system leak greater than what value is considered nonallowable/excessive in the scavenging lecture?",
             "choices": [
                   "350 mL/min",
@@ -3097,7 +3163,21 @@
             "why": "The scavenging lecture distinguishes allowable leaks below 350 mL/min from nonallowable leaks greater than 350 mL/min."
       },
       {
+            "category": "Advanced Scavenging: Leak Sources",
+            "difficulty": "hard",
+            "q": "Which leak source group is listed under the low-pressure section of the anesthesia machine in the scavenging lecture?",
+            "choices": [
+                  "Flowmeters, vaporizers/manifold, breathing circuit, common gas outlet, CO2 absorber, APL/check valves, scavenging system, and oxygen sensor",
+                  "Only gas cylinders and yokes",
+                  "Only pipeline inlets and oxygen pressure-failure alarms",
+                  "Only the central vacuum motor"
+            ],
+            "answer": 0,
+            "why": "The common leak sources slide places these components in the low-pressure section, with the breathing circuit noted as most common."
+      },
+      {
             "category": "Advanced Breathing Circuits: Mapleson",
+            "difficulty": "hard",
             "q": "Which Mapleson pattern is best for spontaneous ventilation, and which is best for controlled ventilation?",
             "choices": [
                   "A for spontaneous, D for controlled",
@@ -3110,6 +3190,7 @@
       },
       {
             "category": "Advanced Breathing Circuits: Bain",
+            "difficulty": "hard",
             "q": "During the Pethick test for a Bain circuit, the reservoir bag remains inflated after the patient-end occlusion is removed while flushing. What does that mean?",
             "choices": [
                   "The inner tube is occluded and the circuit is not safe",
@@ -3122,23 +3203,38 @@
       },
       {
             "category": "Advanced Breathing Circuits: Bain",
+            "difficulty": "hard",
             "q": "What is the consequence of a kinked or disconnected Bain inner tube?",
             "choices": [
                   "The corrugated outer tube becomes dead space, risking hypercapnia",
                   "The circuit becomes a circle system with no rebreathing",
                   "The APL valve can no longer open",
-                  "The vaporizer output doubles"
+                  "The HME doubles its filtration efficiency"
             ],
             "answer": 0,
             "why": "If the Bain inner tube fails, the corrugated tubing behaves as dead space and CO2 rebreathing/hypercapnia can occur."
       },
       {
+            "category": "Advanced Breathing Circuits: Circle Valves",
+            "difficulty": "hard",
+            "q": "Which circle-system valve placement rule prevents CO2 rebreathing?",
+            "choices": [
+                  "Each unidirectional valve must be between the patient and rebreathing bag; FGF and APL cannot be placed where they bypass that protection",
+                  "Both valves should be distal to the Y-piece near the ETT",
+                  "FGF should enter between the expiratory valve and patient",
+                  "The APL valve should be between the patient and inspiratory valve"
+            ],
+            "answer": 0,
+            "why": "The circle system slide states valves must sit between patient and bag, FGF cannot enter between expiratory valve and patient, and APL cannot sit between patient and inspiratory valve."
+      },
+      {
             "category": "Advanced Breathing Circuits: Valves",
+            "difficulty": "hard",
             "q": "An elevated capnography baseline that does not return to zero most strongly suggests which circle-system problem?",
             "choices": [
                   "Incompetent expiratory valve",
-                  "Overfilled vaporizer",
-                  "Low oxygen cylinder pressure",
+                  "Overfilled scavenger reservoir",
+                  "Low HME humidity output",
                   "Open negative pressure relief valve"
             ],
             "answer": 0,
@@ -3146,18 +3242,20 @@
       },
       {
             "category": "Advanced Breathing Circuits: Valves",
+            "difficulty": "hard",
             "q": "An abnormal beta angle on the capnogram suggests rebreathing during inspiration. Which valve is most likely incompetent?",
             "choices": [
                   "Inspiratory valve",
-                  "Cylinder check valve",
+                  "Scavenger flow indicator",
                   "Negative pressure relief valve",
-                  "Second-stage regulator"
+                  "Reservoir bag"
             ],
             "answer": 0,
             "why": "The lecture links an incompetent inspiratory valve with an abnormal beta angle and inspiratory rebreathing."
       },
       {
             "category": "Advanced Breathing Circuits: Valves",
+            "difficulty": "hard",
             "q": "ASTM resistance testing for unidirectional valves uses what adult test flow and maximum pressure drop?",
             "choices": [
                   "1 L/sec with no more than 1.5 cm H2O pressure drop",
@@ -3170,6 +3268,7 @@
       },
       {
             "category": "Advanced Breathing Circuits: Dead Space",
+            "difficulty": "hard",
             "q": "Where should extension tubing be placed to avoid adding mechanical dead space near the patient?",
             "choices": [
                   "At the inspiratory and expiratory check valves rather than distal to the Y-piece",
@@ -3182,10 +3281,11 @@
       },
       {
             "category": "Advanced Absorbers: Airspace",
+            "difficulty": "hard",
             "q": "A 1400 mL absorber has estimated usable airspace of 700-910 mL. Why does this matter clinically?",
             "choices": [
                   "Patient TV should not exceed available absorber airspace or efficiency can fall",
-                  "It determines vaporizer splitting ratio only",
+                  "It determines filter pore size only",
                   "It prevents all fresh gas flow coupling",
                   "It replaces the need for inspired CO2 monitoring"
             ],
@@ -3194,6 +3294,7 @@
       },
       {
             "category": "Advanced Absorbers: Channeling",
+            "difficulty": "hard",
             "q": "Why are baffles or annular rings used in some absorber designs?",
             "choices": [
                   "To direct flow toward the central canister and compensate for wall effect",
@@ -3205,7 +3306,21 @@
             "why": "Baffles increase the path of travel along the sides and direct gas toward the center to reduce wall-effect channeling."
       },
       {
+            "category": "Advanced Absorbers: Void Space",
+            "difficulty": "hard",
+            "q": "As absorbent is used, carbonates and water fill interstitial void space. What is the clinical consequence when TV approaches available void space?",
+            "choices": [
+                  "Absorber efficiency decreases because less airspace is available for the patient's tidal volume",
+                  "Absorbent efficiency becomes permanently 100%",
+                  "Fresh gas flow no longer matters",
+                  "The inspiratory valve becomes unnecessary"
+            ],
+            "answer": 0,
+            "why": "The CO2 absorption slides state that reaction products fill void space, reducing available airspace; TV greater than or equal to available void space causes inefficiency."
+      },
+      {
             "category": "Advanced Absorbers: Replacement",
+            "difficulty": "hard",
             "q": "In a two-canister absorber, why is the lower canister often moved to the upper position during replacement?",
             "choices": [
                   "The upstream/top canister is usually more exhausted, so the less-used lower canister is advanced upstream",
@@ -3217,100 +3332,30 @@
             "why": "CO2 is absorbed mostly in the upstream chamber first; replacement commonly discards the more exhausted upper canister and advances the lower canister."
       },
       {
-            "category": "Advanced Gas Supply: Cylinders",
-            "q": "An oxygen E-cylinder reads 1200 psig. Using 660 L at 1900 psig, about how many liters remain?",
+            "category": "Advanced HME: Monitoring",
+            "difficulty": "hard",
+            "q": "If the gas sampling line is connected on the machine side of an HME, what monitoring problem can occur?",
             "choices": [
-                  "417 L",
-                  "120 L",
-                  "660 L",
-                  "1590 L"
+                  "ETCO2 values may be significantly lower, especially during spontaneous breathing",
+                  "Inspired humidity becomes exactly 100% in all patients",
+                  "The HME automatically removes all mechanical dead space",
+                  "The scavenger reservoir cannot fill"
             ],
             "answer": 0,
-            "why": "Cross multiply: 660/1900 = x/1200, so x is about 417 L."
+            "why": "The humidification and filtration lecture warns that sampling on the machine side of an HME can significantly lower measured ETCO2, especially in spontaneously breathing patients."
       },
       {
-            "category": "Advanced Gas Supply: Cylinders",
-            "q": "That same oxygen E-cylinder has about 417 L remaining. At 2 L/min, about how long will it last?",
+            "category": "Advanced HME: Dead Space",
+            "difficulty": "hard",
+            "q": "Why is placing HMEs in series a bad strategy for small patients even if it can improve moisture exchange?",
             "choices": [
-                  "About 208 minutes, or roughly 3.5 hours",
-                  "About 20 minutes",
-                  "About 660 minutes",
-                  "About 45 minutes"
+                  "It adds dead space and can promote rebreathing and CO2 buildup",
+                  "It eliminates all filtration",
+                  "It lowers all airway resistance to zero",
+                  "It prevents visible contamination"
             ],
             "answer": 0,
-            "why": "417 L divided by 2 L/min gives about 208 minutes, which is roughly 3.5 hours."
-      },
-      {
-            "category": "Advanced Gas Supply: Nitrous Oxide",
-            "q": "Why does a nitrous oxide E-cylinder pressure gauge stay near 745 psig for much of use?",
-            "choices": [
-                  "Liquid N2O vaporizes to gas, keeping pressure relatively constant until the liquid is gone",
-                  "The Bourdon gauge is intentionally disconnected",
-                  "N2O is stored only as compressed gas with no liquid phase",
-                  "The first-stage regulator holds the cylinder at 745 psig"
-            ],
-            "answer": 0,
-            "why": "N2O is stored partly as liquid; as gas leaves, liquid vaporizes and maintains pressure until the liquid phase is depleted."
-      },
-      {
-            "category": "Advanced Gas Supply: Machine Pressures",
-            "q": "Why does an anesthesia machine preferentially use pipeline gas over a connected oxygen cylinder after first-stage regulation?",
-            "choices": [
-                  "Pipeline pressure is about 50-55 psig, slightly higher than the cylinder regulator output around 45 psig",
-                  "Pipeline gas enters at 1900 psig",
-                  "Cylinder regulators reduce pressure to 5 psig",
-                  "Pipeline gas bypasses every check valve"
-            ],
-            "answer": 0,
-            "why": "Cylinder pressure is reduced to about 45 psig, while pipeline supply enters around 50-55 psig, so the machine preferentially draws from pipeline."
-      },
-      {
-            "category": "Advanced Machine Safety: Oxygen Flush",
-            "q": "Which combination best describes the oxygen flush valve?",
-            "choices": [
-                  "35-75 L/min, self-closing, bypasses vaporizers, no allowable leak rate",
-                  "1-5 L/min, flows through vaporizers, remains locked open",
-                  "Only active when the master switch is off",
-                  "Used to meter volatile agent concentration"
-            ],
-            "answer": 0,
-            "why": "The PDF lists O2 flush standards of 35-75 L/min, one-position self-closing activation, no flow through vaporizers, and no allowable leak rate."
-      },
-      {
-            "category": "Advanced Machine Safety: Pressure Sensor",
-            "q": "A pressure sensor shutoff valve prevents N2O flow when O2 supply pressure is inadequate. What is the key limitation of this device?",
-            "choices": [
-                  "It senses pressure only and is not an oxygen analyzer",
-                  "It measures volatile anesthetic concentration only",
-                  "It detects CO2 absorbent exhaustion",
-                  "It confirms cylinder color and pin index"
-            ],
-            "answer": 0,
-            "why": "The pressure sensor shutoff valve depends on oxygen supply pressure. It does not analyze the actual oxygen concentration."
-      },
-      {
-            "category": "Advanced Flowmeters: Reading Floats",
-            "q": "How should the Ohmeda triangular float and Drager ball float be read?",
-            "choices": [
-                  "Ohmeda at the top; Drager at the middle",
-                  "Ohmeda at the middle; Drager at the top",
-                  "Both at the bottom",
-                  "Both at the meniscus"
-            ],
-            "answer": 0,
-            "why": "The lecture states Ohmeda's triangular float is read at the top and Drager's ball float is read at the middle."
-      },
-      {
-            "category": "Advanced Breathing Circuits: APL Valve",
-            "q": "During manual ventilation, the reservoir bag will not fill because the APL valve is open too much. What is the best interpretation?",
-            "choices": [
-                  "Too much gas is escaping through the APL valve before the bag can fill",
-                  "The inspiratory valve is guaranteed to be missing",
-                  "The oxygen flush valve is stuck open",
-                  "The absorber is necessarily exhausted"
-            ],
-            "answer": 0,
-            "why": "The APL valve must be adjusted for manual ventilation; if it is too open, the bag will not fill. If too closed, pressure can rise and cause barotrauma."
+            "why": "The approved HME slides state that HMEs in series can boost performance but add dead space, which is bad for small patients and can increase CO2 buildup risk."
       }
 ];
 
