@@ -1,0 +1,3022 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Machine Quiz</title>
+  <style>
+    :root {
+      --ink: #101410;
+      --paper: #f7efe0;
+      --cream: #fff9ee;
+      --green: #0f3b2f;
+      --sage: #c9ddb8;
+      --gold: #f4aa19;
+      --red: #b94a34;
+      --blue: #243f70;
+      --muted: rgba(16, 20, 16, 0.68);
+      --shadow: 12px 12px 0 rgba(15, 59, 47, 0.92), 0 24px 70px rgba(15, 59, 47, 0.22);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: Georgia, "Times New Roman", serif;
+      background:
+        radial-gradient(circle at 14% 16%, rgba(244, 170, 25, 0.34), transparent 28%),
+        radial-gradient(circle at 86% 12%, rgba(36, 63, 112, 0.17), transparent 28%),
+        linear-gradient(135deg, #fbf4e7, #dcc596);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.18;
+      background-image:
+        linear-gradient(90deg, rgba(15,59,47,.14) 1px, transparent 1px),
+        linear-gradient(rgba(15,59,47,.1) 1px, transparent 1px);
+      background-size: 34px 34px;
+      mask-image: radial-gradient(circle at center, black, transparent 80%);
+    }
+
+    .shell {
+      position: relative;
+      width: min(1280px, calc(100vw - 30px));
+      margin: 0 auto;
+      padding: 26px 0 34px;
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 18px;
+      align-items: end;
+      margin-bottom: 24px;
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      font: 800 12px/1 "Trebuchet MS", sans-serif;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--red);
+    }
+
+    h1 {
+      margin: 0;
+      color: var(--green);
+      font-size: clamp(38px, 7vw, 78px);
+      line-height: .88;
+      letter-spacing: -.055em;
+    }
+
+    .score-card {
+      min-width: 220px;
+      padding: 15px 18px;
+      border: 2px solid var(--green);
+      background: rgba(255, 249, 238, .75);
+      box-shadow: 8px 8px 0 var(--green);
+      text-align: right;
+      font: 900 13px/1.4 "Trebuchet MS", sans-serif;
+      text-transform: uppercase;
+      letter-spacing: .09em;
+    }
+
+    .quiz-nav {
+      position: sticky;
+      top: 20px;
+      display: grid;
+      gap: 10px;
+      border: 2px solid var(--green);
+      border-radius: 22px;
+      padding: 18px;
+      background: rgba(255,249,238,.75);
+      box-shadow: 8px 8px 0 rgba(15,59,47,.86);
+      font: 900 12px/1 "Trebuchet MS", sans-serif;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    .quiz-nav a {
+      border: 2px solid var(--green);
+      border-radius: 16px;
+      padding: 13px 14px;
+      background: rgba(255,249,238,.75);
+      color: var(--green);
+      text-decoration: none;
+      box-shadow: 4px 4px 0 rgba(15,59,47,.22);
+    }
+
+    .quiz-nav a[aria-current="page"] {
+      background: var(--green);
+      color: var(--paper);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 220px minmax(0, 1fr) 300px;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .quiz-card {
+      border: 3px solid var(--green);
+      border-radius: 30px;
+      min-height: 610px;
+      padding: clamp(24px, 4vw, 48px);
+      background:
+        linear-gradient(145deg, rgba(255,255,255,.65), transparent 34%),
+        repeating-linear-gradient(0deg, rgba(15,59,47,.055) 0 1px, transparent 1px 22px),
+        var(--paper);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .quiz-card::after {
+      content: "MACHINE";
+      position: absolute;
+      right: -24px;
+      bottom: -28px;
+      font: 900 clamp(78px, 15vw, 144px)/1 "Trebuchet MS", sans-serif;
+      letter-spacing: -.1em;
+      color: rgba(15,59,47,.055);
+      pointer-events: none;
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+      font: 900 12px/1 "Trebuchet MS", sans-serif;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+      color: var(--blue);
+    }
+
+    .chip {
+      border: 2px solid currentColor;
+      border-radius: 999px;
+      padding: 7px 10px;
+      background: rgba(244,170,25,.18);
+    }
+
+    .question {
+      margin: 0 0 24px;
+      color: var(--green);
+      font-size: clamp(28px, 4.5vw, 54px);
+      line-height: .98;
+      letter-spacing: -.045em;
+      max-width: 900px;
+    }
+
+    .choices {
+      display: grid;
+      gap: 12px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .choice {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 13px;
+      align-items: center;
+      width: 100%;
+      border: 2px solid var(--green);
+      border-radius: 18px;
+      padding: 15px 16px;
+      background: rgba(255,249,238,.72);
+      color: var(--ink);
+      font: 800 16px/1.25 "Trebuchet MS", sans-serif;
+      text-align: left;
+      cursor: pointer;
+      box-shadow: 5px 5px 0 rgba(15,59,47,.28);
+      transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
+    }
+
+    .choice:hover:not(:disabled) {
+      transform: translate(-1px, -1px);
+      box-shadow: 7px 7px 0 rgba(15,59,47,.28);
+      background: #fffaf0;
+    }
+
+    .choice:disabled { cursor: default; }
+    .choice.correct { background: #dff0cf; border-color: #1f6c3d; }
+    .choice.wrong { background: #f2c9bd; border-color: var(--red); }
+
+    .letter {
+      display: inline-grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--green);
+      color: var(--paper);
+      font-size: 13px;
+    }
+
+    .feedback {
+      display: none;
+      position: relative;
+      z-index: 1;
+      margin-top: 22px;
+      border: 2px solid var(--green);
+      border-radius: 18px;
+      padding: 16px;
+      background: rgba(255,249,238,.78);
+      font: 800 15px/1.45 "Trebuchet MS", sans-serif;
+    }
+
+    .feedback.show { display: block; }
+    .feedback strong { color: var(--red); text-transform: uppercase; letter-spacing: .08em; }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 22px;
+      position: relative;
+      z-index: 1;
+    }
+
+    button.action {
+      border: 2px solid var(--green);
+      border-radius: 16px;
+      padding: 13px 16px;
+      background: var(--green);
+      color: var(--paper);
+      font: 900 13px/1 "Trebuchet MS", sans-serif;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: 4px 4px 0 rgba(15,59,47,.3);
+    }
+
+    button.action.secondary { background: var(--cream); color: var(--green); }
+    button.action.gold { background: var(--gold); color: var(--ink); }
+    aside { display: grid; gap: 14px; }
+
+    .panel {
+      border: 2px solid var(--green);
+      border-radius: 22px;
+      padding: 18px;
+      background: rgba(255,249,238,.75);
+      box-shadow: 8px 8px 0 rgba(15,59,47,.86);
+    }
+
+    .panel-title {
+      margin: 0 0 10px;
+      color: var(--red);
+      font: 900 13px/1 "Trebuchet MS", sans-serif;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+    }
+
+    .meter-label {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+      font: 900 12px/1 "Trebuchet MS", sans-serif;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    .bar {
+      height: 16px;
+      border: 2px solid var(--green);
+      border-radius: 999px;
+      overflow: hidden;
+      background: rgba(15,59,47,.12);
+    }
+
+    .bar span {
+      display: block;
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, var(--gold), var(--red));
+      transition: width 240ms ease;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .stat {
+      border: 2px solid rgba(15,59,47,.45);
+      border-radius: 14px;
+      padding: 11px;
+      background: rgba(255,255,255,.38);
+      font: 900 12px/1.25 "Trebuchet MS", sans-serif;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .stat b {
+      display: block;
+      margin-top: 5px;
+      color: var(--green);
+      font-size: 24px;
+      letter-spacing: -.04em;
+    }
+
+    .review {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 8px;
+      max-height: 310px;
+      overflow: auto;
+    }
+
+    .review li {
+      border-left: 5px solid rgba(15,59,47,.3);
+      padding: 8px 9px;
+      background: rgba(255,255,255,.36);
+      font: 800 12px/1.25 "Trebuchet MS", sans-serif;
+      cursor: pointer;
+    }
+
+    .review li.correct { border-left-color: #1f6c3d; }
+    .review li.wrong { border-left-color: var(--red); }
+    .review li.current { background: rgba(244,170,25,.25); }
+
+    .final-screen { display: none; position: relative; z-index: 2; }
+    .final-screen.show { display: block; }
+    .quiz-content.hide { display: none; }
+
+    .final-score {
+      margin: 0 0 14px;
+      color: var(--green);
+      font-size: clamp(48px, 9vw, 110px);
+      line-height: .85;
+      letter-spacing: -.07em;
+    }
+
+    .final-copy {
+      max-width: 720px;
+      color: var(--muted);
+      font: 800 18px/1.45 "Trebuchet MS", sans-serif;
+    }
+
+    @media (max-width: 1050px) {
+      header, .layout { grid-template-columns: 1fr; }
+      .score-card { text-align: left; }
+      .quiz-nav { position: static; }
+      .quiz-card { min-height: auto; }
+      .review { max-height: 150px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div>
+        <p class="eyebrow">Practice Mode</p>
+        <h1>Machine Quiz</h1>
+      </div>
+      <div class="score-card" id="scoreCard">Score: 0 / 0<br>Answered: 0</div>
+    </header>
+
+    <section class="layout">
+      <nav class="quiz-nav" aria-label="Quiz pages">
+        <p class="panel-title">Quiz List</p>
+        <a href="./machine.html" aria-current="page">Machine Quiz</a>
+        <a href="./renal.html">Renal Outline Quiz</a>
+      </nav>
+
+      <article class="quiz-card">
+        <div class="quiz-content" id="quizContent">
+          <div class="tag-row"><span class="chip" id="category">Category</span><span id="counter">Question 1 / 1</span></div>
+          <h2 class="question" id="question"></h2>
+          <div class="choices" id="choices"></div>
+          <div class="feedback" id="feedback"></div>
+          <div class="actions">
+            <button class="action secondary" id="prevBtn">Previous</button>
+            <button class="action" id="nextBtn">Next</button>
+            <button class="action gold" id="shuffleBtn">Shuffle & Restart</button>
+          </div>
+        </div>
+        <div class="final-screen" id="finalScreen">
+          <p class="eyebrow">Quiz Complete</p>
+          <h2 class="final-score" id="finalScore">0%</h2>
+          <p class="final-copy" id="finalCopy"></p>
+          <div class="actions">
+            <button class="action gold" id="restartBtn">Restart Quiz</button>
+            <button class="action secondary" id="reviewBtn">Review Missed</button>
+          </div>
+        </div>
+      </article>
+
+      <aside>
+        <div class="panel">
+          <div class="meter-label"><span>Progress</span><span id="progressText">0%</span></div>
+          <div class="bar"><span id="progressBar"></span></div>
+          <div class="stats">
+            <div class="stat">Correct<b id="correctStat">0</b></div>
+            <div class="stat">Missed<b id="wrongStat">0</b></div>
+          </div>
+        </div>
+        <div class="panel">
+          <p class="panel-title">Question Map</p>
+          <ol class="review" id="reviewList"></ol>
+        </div>
+        <div class="panel">
+          <p class="panel-title">How To Use</p>
+          <p class="final-copy" style="font-size:13px;margin:0">Pick an answer for instant feedback. Use Next to continue. Keyboard shortcuts: 1-4, arrows, R.</p>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    const questions = [
+      {
+            "category": "CO2 Absorption: Big Picture",
+            "q": "What is the main reason CO2 absorption is needed in a circle system?",
+            "choices": [
+                  "To allow safe rebreathing while preventing hypercapnia",
+                  "To increase oxygen pipeline pressure",
+                  "To sterilize exhaled gas",
+                  "To eliminate the need for vaporizers"
+            ],
+            "answer": 0,
+            "why": "Absorption removes exhaled CO2 so gases can be rebreathed without causing hypercapnia."
+      },
+      {
+            "category": "CO2 Absorption: Circle System",
+            "q": "Compared with a Mapleson system, a circle system is different mainly because it includes what?",
+            "choices": [
+                  "A CO2 absorber canister",
+                  "No unidirectional valves",
+                  "Only non-rebreathing flow",
+                  "No fresh gas inlet"
+            ],
+            "answer": 0,
+            "why": "The absorber canister is the key feature that permits lower flows and rebreathing."
+      },
+      {
+            "category": "CO2 Absorption: Chemistry",
+            "q": "What does CO2 combine with first to form carbonic acid?",
+            "choices": [
+                  "Water",
+                  "Nitrogen",
+                  "Oxygen",
+                  "Calcium carbonate"
+            ],
+            "answer": 0,
+            "why": "CO2 + H2O forms H2CO3, carbonic acid."
+      },
+      {
+            "category": "CO2 Absorption: Chemistry",
+            "q": "What are the major products of CO2 absorbent reactions?",
+            "choices": [
+                  "Carbonates, water, and heat",
+                  "Nitrogen, oxygen, and acid",
+                  "Methane and formaldehyde only",
+                  "Calcium hydroxide and sevoflurane"
+            ],
+            "answer": 0,
+            "why": "Neutralization produces carbonates, water, and heat."
+      },
+      {
+            "category": "CO2 Absorption: Acid/Base",
+            "q": "In the lecture, an acid is described as a substance that does what?",
+            "choices": [
+                  "Produces H+ in aqueous solution",
+                  "Produces OH- in aqueous solution",
+                  "Always has a pH above 10",
+                  "Accepts all water molecules"
+            ],
+            "answer": 0,
+            "why": "Acids produce H+ and act as proton donors."
+      },
+      {
+            "category": "CO2 Absorption: Acid/Base",
+            "q": "A base or alkali is best described as what?",
+            "choices": [
+                  "Produces OH- and accepts H+",
+                  "Produces only CO2",
+                  "Always prevents ionization",
+                  "Has no pH"
+            ],
+            "answer": 0,
+            "why": "Bases produce OH- in aqueous solution and accept protons."
+      },
+      {
+            "category": "CO2 Absorption: Water",
+            "q": "Why must CO2 absorbent granules contain water?",
+            "choices": [
+                  "Water allows CO2 to form carbonic acid for neutralization",
+                  "Water blocks all fresh gas flow",
+                  "Water prevents all color changes",
+                  "Water replaces calcium hydroxide"
+            ],
+            "answer": 0,
+            "why": "Water is required for carbonic acid formation and efficient absorption."
+      },
+      {
+            "category": "CO2 Absorption: Water",
+            "q": "What can happen when absorbent granules become very dry?",
+            "choices": [
+                  "Carbon monoxide production can increase",
+                  "Absorption becomes permanently 100% efficient",
+                  "Indicators become more reliable",
+                  "All anesthetic degradation stops"
+            ],
+            "answer": 0,
+            "why": "Desiccated absorbent can degrade volatile agents and produce CO."
+      },
+      {
+            "category": "CO2 Absorption: Fresh Gas Flow",
+            "q": "Which FGF range produces near-total rebreathing and strong reliance on CO2 absorption?",
+            "choices": [
+                  "0.3-0.5 L/min",
+                  "4-5 L/min",
+                  "10-15 L/min",
+                  "20 L/min only"
+            ],
+            "answer": 0,
+            "why": "Very low FGF requires the absorbent to remove most exhaled CO2."
+      },
+      {
+            "category": "CO2 Absorption: Fresh Gas Flow",
+            "q": "At FGF greater than about 4-5 L/min, reliance on absorbent is generally what?",
+            "choices": [
+                  "Low",
+                  "Total",
+                  "Impossible to predict",
+                  "Greater than at low flow"
+            ],
+            "answer": 0,
+            "why": "High FGF washes out exhaled gases and reduces rebreathing."
+      },
+      {
+            "category": "CO2 Absorption: Soda Lime",
+            "q": "What is the most common CO2 absorbent listed in the lecture?",
+            "choices": [
+                  "Soda lime",
+                  "Helium lime",
+                  "Trichloroethylene",
+                  "Pure sodium chloride"
+            ],
+            "answer": 0,
+            "why": "Soda lime is identified as the most common absorbent."
+      },
+      {
+            "category": "CO2 Absorption: Soda Lime",
+            "q": "What is the main ingredient in soda lime?",
+            "choices": [
+                  "Calcium hydroxide",
+                  "Barium sulfate",
+                  "Ethyl violet",
+                  "Silicone oil"
+            ],
+            "answer": 0,
+            "why": "The lecture lists calcium hydroxide as the main ingredient, around 80%."
+      },
+      {
+            "category": "CO2 Absorption: Soda Lime",
+            "q": "Why are silica and kieselguhr added to soda lime?",
+            "choices": [
+                  "To minimize dust by hardening granules",
+                  "To produce Compound A",
+                  "To remove all water",
+                  "To turn granules purple immediately"
+            ],
+            "answer": 0,
+            "why": "Hardeners reduce fragmentation and dust formation."
+      },
+      {
+            "category": "CO2 Absorption: Baralyme",
+            "q": "Which activator was associated with Baralyme?",
+            "choices": [
+                  "Barium hydroxide",
+                  "Lithium chloride",
+                  "Nitrous oxide",
+                  "Formic acid"
+            ],
+            "answer": 0,
+            "why": "Baralyme contained barium hydroxide and calcium hydroxide."
+      },
+      {
+            "category": "CO2 Absorption: Indicators",
+            "q": "Absorbent indicators change color primarily because of a change in what?",
+            "choices": [
+                  "pH",
+                  "Oxygen cylinder pressure",
+                  "Patient hemoglobin",
+                  "Vaporizer dial setting"
+            ],
+            "answer": 0,
+            "why": "Indicators are acid/base dyes whose color depends on pH."
+      },
+      {
+            "category": "CO2 Absorption: Indicators",
+            "q": "Why is color change alone unreliable for absorbent exhaustion?",
+            "choices": [
+                  "Regeneration/peaking can make color revert despite low capacity",
+                  "Granules never change color",
+                  "Color change proves full absorptive capacity",
+                  "Ethyl violet measures oxygen only"
+            ],
+            "answer": 0,
+            "why": "The dye can revert even though the granules are still exhausted."
+      },
+      {
+            "category": "CO2 Absorption: Monitoring",
+            "q": "What is the most important way to detect rising inspired CO2?",
+            "choices": [
+                  "Capnometry/capnography",
+                  "Listening for machine clicks",
+                  "Checking the oxygen tank color",
+                  "Measuring room temperature"
+            ],
+            "answer": 0,
+            "why": "The lecture emphasizes capnometry over color change alone."
+      },
+      {
+            "category": "CO2 Absorption: CO Risk",
+            "q": "The 1990s carbon monoxide cases often occurred when?",
+            "choices": [
+                  "After machines sat idle with flows left on, often Monday morning",
+                  "Only during MRI anesthesia",
+                  "Only when no absorbent was present",
+                  "Only in pediatric circuits"
+            ],
+            "answer": 0,
+            "why": "Idle machines with continued flow dried absorbent and increased CO risk."
+      },
+      {
+            "category": "CO2 Absorption: CO Risk",
+            "q": "If granule water content falls below standard, what toxic gas can accumulate?",
+            "choices": [
+                  "Carbon monoxide",
+                  "Helium",
+                  "Argon",
+                  "Ozone only"
+            ],
+            "answer": 0,
+            "why": "Desiccated granules can promote carbon monoxide formation."
+      },
+      {
+            "category": "CO2 Absorption: Agent Degradation",
+            "q": "Which volatile agent is degraded most by soda lime according to the lecture?",
+            "choices": [
+                  "Sevoflurane",
+                  "Desflurane",
+                  "Nitrous oxide",
+                  "Oxygen"
+            ],
+            "answer": 0,
+            "why": "The lecture states soda lime degrades sevoflurane most and desflurane least."
+      },
+      {
+            "category": "CO2 Absorption: Halothane",
+            "q": "Halothane plus soda lime can produce which metabolite?",
+            "choices": [
+                  "BCDFE",
+                  "Compound Z",
+                  "Ethyl violet",
+                  "Calcium carbonate only"
+            ],
+            "answer": 0,
+            "why": "BCDFE is the halothane degradation metabolite noted in the slides."
+      },
+      {
+            "category": "CO2 Absorption: Sevoflurane",
+            "q": "Compound A is associated with degradation of which anesthetic?",
+            "choices": [
+                  "Sevoflurane",
+                  "Halothane",
+                  "Trilene",
+                  "Chloroform only"
+            ],
+            "answer": 0,
+            "why": "Sevoflurane reacts with CO2 granules to produce Compound A."
+      },
+      {
+            "category": "CO2 Absorption: Sevoflurane",
+            "q": "Compound A levels are highest during what condition?",
+            "choices": [
+                  "Low-flow anesthesia",
+                  "No anesthesia",
+                  "High oxygen flush only",
+                  "Disconnected breathing circuit"
+            ],
+            "answer": 0,
+            "why": "Low flow increases residence time and Compound A concentration."
+      },
+      {
+            "category": "CO2 Absorption: Sevoflurane",
+            "q": "The product guidance in the lecture warns against sevoflurane at total FGF below 1 L/min for more than what duration?",
+            "choices": [
+                  "2 MAC-hours",
+                  "2 minutes",
+                  "24 hours",
+                  "One week"
+            ],
+            "answer": 0,
+            "why": "The slide states not recommended below 1 L/min for more than 2 MAC-hours."
+      },
+      {
+            "category": "CO2 Absorption: Contraindications",
+            "q": "Trichloroethylene with alkali and heat can degrade into which toxins?",
+            "choices": [
+                  "Dichloroacetylene, phosgene, and CO",
+                  "Only oxygen and water",
+                  "Nitrogen and helium",
+                  "Ethyl violet and silica"
+            ],
+            "answer": 0,
+            "why": "These toxic products are listed under Trilene contraindications."
+      },
+      {
+            "category": "CO2 Absorption: Contraindications",
+            "q": "Chloroform breakdown can form which pulmonary toxin?",
+            "choices": [
+                  "Phosgene",
+                  "Calcium carbonate",
+                  "Kieselguhr",
+                  "Sodasorb"
+            ],
+            "answer": 0,
+            "why": "Phosgene can cause delayed pulmonary toxicity."
+      },
+      {
+            "category": "CO2 Absorption: Fires",
+            "q": "Fires with sevoflurane were linked to absorbent granules containing less than what water percentage?",
+            "choices": [
+                  "5%",
+                  "25%",
+                  "50%",
+                  "95%"
+            ],
+            "answer": 0,
+            "why": "The lecture notes fires with CO2 absorbents containing less than 5% water."
+      },
+      {
+            "category": "CO2 Absorption: New Absorbents",
+            "q": "Why remove strong monovalent bases like NaOH and KOH from absorbents?",
+            "choices": [
+                  "They are implicated in CO and Compound A production",
+                  "They eliminate all CO2 absorption",
+                  "They make absorbents too soft to use",
+                  "They prevent pH change"
+            ],
+            "answer": 0,
+            "why": "Newer absorbents aim to reduce toxic byproducts while maintaining absorption."
+      },
+      {
+            "category": "CO2 Absorption: Toxicity",
+            "q": "What is a patient risk from absorbent dust?",
+            "choices": [
+                  "Bronchospasm or airway irritation",
+                  "Improved oxygenation only",
+                  "Reduced airway resistance always",
+                  "Instant sterilization"
+            ],
+            "answer": 0,
+            "why": "Dust is caustic and can irritate the airway."
+      },
+      {
+            "category": "CO2 Absorption: Resistance",
+            "q": "Tightly packed granules tend to do what?",
+            "choices": [
+                  "Increase resistance to airflow",
+                  "Eliminate all resistance",
+                  "Prevent CO2 absorption completely every time",
+                  "Make indicators unnecessary"
+            ],
+            "answer": 0,
+            "why": "Less empty space makes gas flow more resistant."
+      },
+      {
+            "category": "CO2 Absorption: Airspace",
+            "q": "The target canister airspace is about what percentage of canister volume?",
+            "choices": [
+                  "65%",
+                  "5%",
+                  "15%",
+                  "100%"
+            ],
+            "answer": 0,
+            "why": "The lecture describes a goal of about 65% airspace."
+      },
+      {
+            "category": "CO2 Absorption: Tidal Volume",
+            "q": "For a 1400 mL absorber, estimated airspace is approximately what?",
+            "choices": [
+                  "700-910 mL",
+                  "10-20 mL",
+                  "1400-2000 mL",
+                  "Only 50 mL"
+            ],
+            "answer": 0,
+            "why": "Airspace is estimated at 50-65% of total capacity."
+      },
+      {
+            "category": "CO2 Absorption: Wall Effect",
+            "q": "What is the wall effect?",
+            "choices": [
+                  "Gas preferentially flows near the canister wall due to lower resistance",
+                  "Granules stick to the ceiling",
+                  "All gas flows only through the center",
+                  "Water leaves the absorber through walls"
+            ],
+            "answer": 0,
+            "why": "More airspace near the wall creates a lower-resistance path."
+      },
+      {
+            "category": "CO2 Absorption: Channeling",
+            "q": "Channeling means gas does what?",
+            "choices": [
+                  "Follows the path of least resistance",
+                  "Stops moving through the absorber",
+                  "Always mixes evenly",
+                  "Turns into liquid"
+            ],
+            "answer": 0,
+            "why": "Channeling reduces uniform contact with absorbent."
+      },
+      {
+            "category": "CO2 Absorption: Efficiency",
+            "q": "What does 100% absorber efficiency mean?",
+            "choices": [
+                  "All CO2 entering the canister is absorbed",
+                  "All oxygen is removed",
+                  "All volatile agent is destroyed",
+                  "All granules are dry"
+            ],
+            "answer": 0,
+            "why": "Efficiency refers to CO2 absorption, not oxygen or anesthetic removal."
+      },
+      {
+            "category": "CO2 Absorption: Efficiency",
+            "q": "Breakpoint occurs when inspired CO2 reaches approximately what level?",
+            "choices": [
+                  "0.1%",
+                  "0.5%",
+                  "5%",
+                  "50%"
+            ],
+            "answer": 0,
+            "why": "Breakpoint is the first trace of unabsorbed CO2, about 0.1%."
+      },
+      {
+            "category": "CO2 Absorption: Efficiency",
+            "q": "Exhaustion occurs when inspired CO2 reaches approximately what level?",
+            "choices": [
+                  "0.5%",
+                  "0.1%",
+                  "10%",
+                  "21%"
+            ],
+            "answer": 0,
+            "why": "Exhaustion is defined around 0.5% inspired CO2."
+      },
+      {
+            "category": "CO2 Absorption: Variables",
+            "q": "Which factor affects absorber efficiency?",
+            "choices": [
+                  "Granule hardness, size, water content, packing, channeling, and flow rate",
+                  "Only the color of the machine",
+                  "Only the ECG lead placement",
+                  "Only oxygen cylinder size"
+            ],
+            "answer": 0,
+            "why": "Multiple physical and flow variables determine efficiency."
+      },
+      {
+            "category": "CO2 Absorption: Flow Rate",
+            "q": "If flow through granules exceeds minute ventilation, what happens?",
+            "choices": [
+                  "Residence time falls and absorptive capacity is reduced",
+                  "CO2 absorption always improves",
+                  "Resistance becomes zero",
+                  "Granules regenerate"
+            ],
+            "answer": 0,
+            "why": "Less contact time reduces absorption."
+      },
+      {
+            "category": "CO2 Absorption: Void Space",
+            "q": "As absorbent is used, what fills the void space?",
+            "choices": [
+                  "Carbonates and water",
+                  "Helium and nitrogen",
+                  "Fresh oxygen only",
+                  "Ethyl alcohol only"
+            ],
+            "answer": 0,
+            "why": "Reaction products occupy interstitial space and reduce available airspace."
+      },
+      {
+            "category": "CO2 Absorption: Replacement",
+            "q": "When should canisters be replaced based on inspired CO2?",
+            "choices": [
+                  "When inspired CO2 is greater than 3-5 mmHg",
+                  "Only when inspired oxygen is 100%",
+                  "Only every 10 years",
+                  "Never during anesthesia"
+            ],
+            "answer": 0,
+            "why": "Inspired CO2 above 3-5 mmHg suggests rebreathing/exhaustion."
+      },
+      {
+            "category": "CO2 Absorption: Replacement",
+            "q": "A FiCO2 of 0.5% suggests what?",
+            "choices": [
+                  "Absorbent exhaustion/replacement needed",
+                  "Perfect absorber function",
+                  "No need to monitor",
+                  "Oxygen pipeline failure only"
+            ],
+            "answer": 0,
+            "why": "0.5% inspired CO2 is the exhaustion threshold in the lecture."
+      },
+      {
+            "category": "CO2 Absorption: Exhaustion Signs",
+            "q": "Which sign can suggest exhausted absorbent?",
+            "choices": [
+                  "Increased ETCO2 and FiCO2",
+                  "Decreased inspired CO2 to zero only",
+                  "Lower heart rate always",
+                  "No change in ventilation"
+            ],
+            "answer": 0,
+            "why": "Rising expired and inspired CO2 are key signs."
+      },
+      {
+            "category": "CO2 Absorption: High Inspired CO2",
+            "q": "The lecture gives only two reasons for increased inspired CO2. Which pair is correct?",
+            "choices": [
+                  "Exhausted absorbent or faulty unidirectional valves",
+                  "Low room temperature or small ETT",
+                  "High SpO2 or normal ECG",
+                  "Full oxygen tank or new vaporizer"
+            ],
+            "answer": 0,
+            "why": "Those are the two causes explicitly stated."
+      },
+      {
+            "category": "CO2 Absorption: Immediate Action",
+            "q": "If inspired CO2 exceeds 3-5 mmHg, what should FGF be increased to?",
+            "choices": [
+                  "5-8 L/min",
+                  "0.1 L/min",
+                  "Exactly 1 L/min",
+                  "Zero"
+            ],
+            "answer": 0,
+            "why": "Increasing FGF to 5-8 L/min makes the system more semi-open and reduces rebreathing."
+      },
+      {
+            "category": "CO2 Absorption: Mid-Case",
+            "q": "If granules are exhausted but changing canisters is unsafe mid-case, what should you do?",
+            "choices": [
+                  "Increase FGF to 1-2 times minute ventilation",
+                  "Turn off all gas flow",
+                  "Ignore inspired CO2",
+                  "Remove the unidirectional valves"
+            ],
+            "answer": 0,
+            "why": "Higher FGF reduces inspired CO2 until canisters can be changed safely."
+      },
+      {
+            "category": "CO2 Absorption: Replacement",
+            "q": "When replacing canisters, what safety step is emphasized?",
+            "choices": [
+                  "Wear gloves",
+                  "Taste granules for freshness",
+                  "Blow dust toward patient",
+                  "Leave old canisters undated"
+            ],
+            "answer": 0,
+            "why": "Absorbent is caustic, so gloves are emphasized."
+      },
+      {
+            "category": "CO2 Absorption: Replacement",
+            "q": "What should be done to a new canister after replacement?",
+            "choices": [
+                  "Date and time it",
+                  "Remove all labels",
+                  "Leave packaging on",
+                  "Soak it in water"
+            ],
+            "answer": 0,
+            "why": "Dating and timing helps track use and replacement intervals."
+      },
+      {
+            "category": "CO2 Absorption: 48-Hour Rule",
+            "q": "Sodasorb guidance in the lecture recommends changing absorbent if left in the machine for more than what period?",
+            "choices": [
+                  "48 hours",
+                  "4 hours",
+                  "6 months",
+                  "1 year"
+            ],
+            "answer": 0,
+            "why": "The slide states more than 48 hours."
+      },
+      {
+            "category": "CO2 Absorption: 48-Hour Rule",
+            "q": "Why are 48-hour replacement guidelines cautious?",
+            "choices": [
+                  "Flows may dry granules and light may inactivate ethyl violet",
+                  "They prevent all oxygen use",
+                  "They make absorbent cheaper",
+                  "They eliminate need for capnography"
+            ],
+            "answer": 0,
+            "why": "Drying and indicator inactivation can hide risk."
+      },
+      {
+            "category": "Humidification & Filtration: Terminology",
+            "q": "Absolute humidity means what?",
+            "choices": [
+                  "Mass of water vapor in a given volume of gas",
+                  "Percentage of maximum possible water vapor",
+                  "Temperature where condensation begins",
+                  "Pressure from oxygen only"
+            ],
+            "answer": 0,
+            "why": "Absolute humidity is the actual mass of water vapor in gas, commonly mg H2O/L."
+      },
+      {
+            "category": "Humidification & Filtration: Terminology",
+            "q": "Relative humidity represents what?",
+            "choices": [
+                  "Percent of water vapor present relative to maximum capacity at that temperature",
+                  "Total gas pressure from nitrogen",
+                  "Mass of water per liter only",
+                  "The temperature of the gas"
+            ],
+            "answer": 0,
+            "why": "Relative humidity compares current water vapor to the maximum the gas can hold at that temperature."
+      },
+      {
+            "category": "Humidification & Filtration: Terminology",
+            "q": "Dew point is the temperature at which what occurs?",
+            "choices": [
+                  "Air becomes saturated and condensation begins",
+                  "Gas becomes completely dry",
+                  "CO2 absorption stops",
+                  "Oxygen pressure doubles"
+            ],
+            "answer": 0,
+            "why": "At the dew point, gas reaches saturation and water vapor can condense."
+      },
+      {
+            "category": "Humidification & Filtration: Relationships",
+            "q": "What happens to water vapor capacity as temperature increases?",
+            "choices": [
+                  "Warmer gas can hold more water vapor",
+                  "Warmer gas holds less water vapor",
+                  "Temperature has no effect",
+                  "Warmer gas always condenses"
+            ],
+            "answer": 0,
+            "why": "Warm gases have greater water vapor capacity."
+      },
+      {
+            "category": "Humidification & Filtration: Relationships",
+            "q": "If gas is cooled without adding or removing water, relative humidity does what?",
+            "choices": [
+                  "Increases",
+                  "Falls to zero",
+                  "Always stays unchanged",
+                  "Becomes absolute humidity"
+            ],
+            "answer": 0,
+            "why": "Cooler gas has lower water-holding capacity, so relative humidity rises."
+      },
+      {
+            "category": "Humidification & Filtration: Anesthesia",
+            "q": "Medical gases from the anesthesia machine are usually described as what?",
+            "choices": [
+                  "Dry and cold",
+                  "Fully saturated and warm",
+                  "Sterile steam",
+                  "Humidified to body temperature"
+            ],
+            "answer": 0,
+            "why": "The lecture describes anesthesia machine gases as dry and cold, around 20 C."
+      },
+      {
+            "category": "Humidification & Filtration: Anesthesia",
+            "q": "Inspired gases should ideally be what at body temperature?",
+            "choices": [
+                  "100% relative humidity",
+                  "0% absolute humidity",
+                  "Below dew point only",
+                  "Completely dry"
+            ],
+            "answer": 0,
+            "why": "Inspired gases should reach 100% relative humidity near 37 C to protect airways."
+      },
+      {
+            "category": "Humidification & Filtration: Dry Gases",
+            "q": "Which is a major effect of inhaling dry gases?",
+            "choices": [
+                  "Airway dehydration and thickened mucus",
+                  "Improved ciliary function",
+                  "Guaranteed lower airway resistance",
+                  "No heat loss"
+            ],
+            "answer": 0,
+            "why": "Dry gases remove moisture from mucosa, causing irritation and thick secretions."
+      },
+      {
+            "category": "Humidification & Filtration: Dry Gases",
+            "q": "Dry gases can contribute to tracheal tube obstruction by causing what?",
+            "choices": [
+                  "Dry mucosa and viscous secretions",
+                  "Immediate bronchodilation",
+                  "Reduced secretion viscosity",
+                  "Permanent airway humidification"
+            ],
+            "answer": 0,
+            "why": "Drying decreases mucociliary function and thickens secretions."
+      },
+      {
+            "category": "Humidification & Filtration: Dry Gases",
+            "q": "Dry gases can lower body temperature because the airway does what?",
+            "choices": [
+                  "Warms and humidifies inspired gas using patient heat and water",
+                  "Stops all evaporative loss",
+                  "Adds heat to the patient",
+                  "Prevents insensible heat loss"
+            ],
+            "answer": 0,
+            "why": "Conditioning cold dry gases uses patient heat and water, creating heat loss."
+      },
+      {
+            "category": "Humidification & Filtration: Absorbent",
+            "q": "Dry medical gases may affect CO2 absorbent by causing what?",
+            "choices": [
+                  "Absorbent desiccation",
+                  "Permanent absorbent regeneration",
+                  "Lower CO production risk",
+                  "No volatile agent degradation"
+            ],
+            "answer": 0,
+            "why": "Dry gases can dry absorber granules over time."
+      },
+      {
+            "category": "Humidification & Filtration: Absorbent",
+            "q": "Desiccated absorbent can degrade desflurane and isoflurane to produce what?",
+            "choices": [
+                  "Carbon monoxide",
+                  "Oxygen",
+                  "Nitrous oxide",
+                  "Helium"
+            ],
+            "answer": 0,
+            "why": "Dry absorbents can degrade volatile anesthetics and produce CO."
+      },
+      {
+            "category": "Humidification & Filtration: Absorbent",
+            "q": "Dry soda lime can degrade sevoflurane to produce what nephrotoxic compound?",
+            "choices": [
+                  "Compound A",
+                  "BCDFE",
+                  "Phosgene",
+                  "Ethyl violet"
+            ],
+            "answer": 0,
+            "why": "The lecture links sevoflurane degradation by dry soda lime to Compound A."
+      },
+      {
+            "category": "Humidification & Filtration: Excess Humidity",
+            "q": "Too much circuit moisture can promote what?",
+            "choices": [
+                  "Bacterial growth",
+                  "Improved sterility",
+                  "Lower secretions only",
+                  "Elimination of atelectasis"
+            ],
+            "answer": 0,
+            "why": "Water in the circuit can become a home for bacterial growth."
+      },
+      {
+            "category": "Humidification & Filtration: Excess Humidity",
+            "q": "Which is listed as a risk of excessive humidity?",
+            "choices": [
+                  "Atelectasis and decreased FRC",
+                  "Permanent increase in FRC",
+                  "No secretion changes",
+                  "Reduced bacterial growth"
+            ],
+            "answer": 0,
+            "why": "Excessive humidity is associated with increased secretions, atelectasis, decreased FRC, and surfactant effects."
+      },
+      {
+            "category": "Humidification & Filtration: Standards",
+            "q": "The lecture states ANSI/ISO/HME standards target what approximate absolute humidity range?",
+            "choices": [
+                  "25-32 mg H2O/L",
+                  "0-5 mg H2O/L",
+                  "60-80 mg H2O/L",
+                  "100 mg H2O/L"
+            ],
+            "answer": 0,
+            "why": "The slide lists 25-32 mg H2O/L, averaging about 30 mg/L at 37 C."
+      },
+      {
+            "category": "Humidification & Filtration: Conservation",
+            "q": "Low fresh gas flows in a circle system do what to inspired humidity?",
+            "choices": [
+                  "Conserve moisture and increase inspired humidity",
+                  "Eliminate humidity",
+                  "Always cause rainout immediately",
+                  "Prevent rebreathing completely"
+            ],
+            "answer": 0,
+            "why": "Lower FGF increases conservation of heat and moisture."
+      },
+      {
+            "category": "Humidification & Filtration: Conservation",
+            "q": "Higher fresh gas flows generally do what to inspired humidity and temperature?",
+            "choices": [
+                  "Lower both",
+                  "Raise both dramatically",
+                  "Have no effect",
+                  "Only increase temperature"
+            ],
+            "answer": 0,
+            "why": "Higher flows reduce rebreathing and lower humidity/temperature conservation."
+      },
+      {
+            "category": "Humidification & Filtration: HME",
+            "q": "What does an HME primarily do?",
+            "choices": [
+                  "Passively retains exhaled heat and moisture and returns it to inspired gas",
+                  "Actively boils water",
+                  "Absorbs all CO2",
+                  "Measures airway pressure only"
+            ],
+            "answer": 0,
+            "why": "Heat and moisture exchangers are passive humidifiers."
+      },
+      {
+            "category": "Humidification & Filtration: HME",
+            "q": "Where can an HME be placed?",
+            "choices": [
+                  "Near an ETT, mask, LMA, or tracheostomy connection",
+                  "Inside the oxygen cylinder",
+                  "Only inside the vaporizer",
+                  "Only after the scavenger"
+            ],
+            "answer": 0,
+            "why": "The lecture lists use with ETT, mask, LMA, and tracheostomy patients."
+      },
+      {
+            "category": "Humidification & Filtration: HME Hazards",
+            "q": "Which secretion condition increases HME obstruction risk?",
+            "choices": [
+                  "Wet, thick, copious, or bloody secretions",
+                  "No secretions",
+                  "Dry oxygen flow only",
+                  "Low airway pressures only"
+            ],
+            "answer": 0,
+            "why": "Secretions can plug or obstruct HMEs."
+      },
+      {
+            "category": "Humidification & Filtration: HME Hazards",
+            "q": "HME use with small tidal volumes may increase what?",
+            "choices": [
+                  "Dead space and CO2 buildup risk",
+                  "Oxygen concentration to 100% automatically",
+                  "Filtration to zero",
+                  "Body heat loss only"
+            ],
+            "answer": 0,
+            "why": "Added dead space can be more significant with small tidal volumes."
+      },
+      {
+            "category": "Humidification & Filtration: HME Types",
+            "q": "A hygroscopic HME uses what type of material?",
+            "choices": [
+                  "Paper, foam, or fiber coated with moisture-retaining salts",
+                  "A metal heating plate only",
+                  "A vacuum manifold",
+                  "Pure soda lime"
+            ],
+            "answer": 0,
+            "why": "Hygroscopic HMEs retain moisture using salt-coated media."
+      },
+      {
+            "category": "Humidification & Filtration: HME Types",
+            "q": "A hydrophobic HME is especially strong at what?",
+            "choices": [
+                  "Filtration with water-repellent membranes",
+                  "Producing active heat",
+                  "Absorbing CO2",
+                  "Eliminating all resistance"
+            ],
+            "answer": 0,
+            "why": "Hydrophobic membranes provide a liquid barrier and high filtration efficiency."
+      },
+      {
+            "category": "Humidification & Filtration: Humidifiers",
+            "q": "A pass-over humidifier works by what mechanism?",
+            "choices": [
+                  "Gas flows over a water surface",
+                  "Gas bubbles from the bottom only",
+                  "A dry filter absorbs all water",
+                  "A scavenger adds steam"
+            ],
+            "answer": 0,
+            "why": "Pass-over humidifiers humidify by flowing gas over water."
+      },
+      {
+            "category": "Humidification & Filtration: Humidifiers",
+            "q": "Bubble humidifiers tend to have what humidity output and resistance?",
+            "choices": [
+                  "Low humidity output and high resistance",
+                  "High humidity output and no resistance",
+                  "No humidity output and no resistance",
+                  "Only filtration function"
+            ],
+            "answer": 0,
+            "why": "The lecture table lists bubble humidifiers as low output and higher resistance."
+      },
+      {
+            "category": "Humidification & Filtration: Heated Humidifiers",
+            "q": "Heated humidifiers are most commonly useful for which cases?",
+            "choices": [
+                  "Long cases, pediatric patients, and compromised respiratory function",
+                  "Only short healthy adult cases",
+                  "Only scavenger setup",
+                  "Only vaporizer filling"
+            ],
+            "answer": 0,
+            "why": "The lecture lists long surgical cases, pediatric patients, and compromised respiratory function."
+      },
+      {
+            "category": "Humidification & Filtration: Heated Humidifiers",
+            "q": "A heated wire circuit mainly prevents what?",
+            "choices": [
+                  "Condensation in the circuit",
+                  "CO2 production",
+                  "Anesthetic vaporization",
+                  "All airway resistance"
+            ],
+            "answer": 0,
+            "why": "Heated wire circuits maintain gas temperature to reduce rainout."
+      },
+      {
+            "category": "Humidification & Filtration: Filters",
+            "q": "Breathing circuit filters are used to remove what?",
+            "choices": [
+                  "Bacteria, viruses, and particulates",
+                  "All oxygen",
+                  "All anesthetic vapor",
+                  "All nitrogen"
+            ],
+            "answer": 0,
+            "why": "The stated goal is removal of unwanted bacteria, viruses, and particulates."
+      },
+      {
+            "category": "Humidification & Filtration: Filters",
+            "q": "Small filter pores generally do what?",
+            "choices": [
+                  "Increase hydrophobicity and filtration efficiency but may increase resistance if clogged",
+                  "Allow all water and organisms through",
+                  "Prevent gas flow completely by design",
+                  "Make filters unnecessary"
+            ],
+            "answer": 0,
+            "why": "Smaller pores improve filtration but clogging can increase resistance."
+      },
+      {
+            "category": "Humidification & Filtration: Filters",
+            "q": "Electret filters trap fine particles by what mechanism?",
+            "choices": [
+                  "Charged fibers with electrostatic attraction",
+                  "Heating water to steam",
+                  "CO2 neutralization",
+                  "Vacuum suction only"
+            ],
+            "answer": 0,
+            "why": "Electret filters use electrostatically charged fibers."
+      },
+      {
+            "category": "Humidification & Filtration: Filters",
+            "q": "If moisture is seen on the machine side of a filter, what should be done?",
+            "choices": [
+                  "Replace the filter",
+                  "Ignore it until the next month",
+                  "Turn off capnography",
+                  "Remove all filtration"
+            ],
+            "answer": 0,
+            "why": "The slide states moisture on the machine side means replace the filter."
+      },
+      {
+            "category": "Humidification & Filtration: Summary",
+            "q": "Why are combined HME/filter devices used widely?",
+            "choices": [
+                  "They retain heat/moisture and provide bacterial/viral filtration",
+                  "They replace vaporizers",
+                  "They absorb all anesthetic gases",
+                  "They eliminate need for ventilation"
+            ],
+            "answer": 0,
+            "why": "The summary emphasizes combined heat/moisture retention plus filtration benefits."
+      },
+      {
+            "category": "Scavenger System: Purpose",
+            "q": "What is the main purpose of an anesthesia scavenging system?",
+            "choices": [
+                  "Capture and remove waste anesthetic gases from the OR",
+                  "Increase inspired oxygen concentration",
+                  "Humidify inspired gases",
+                  "Measure ETCO2"
+            ],
+            "answer": 0,
+            "why": "Scavenging systems protect staff by capturing and removing WAG."
+      },
+      {
+            "category": "Scavenger System: WAG",
+            "q": "Waste anesthetic gas levels vary based on which factors?",
+            "choices": [
+                  "Fresh gas flow, technique, ventilation quality, measurement location, and duration",
+                  "Only patient age",
+                  "Only room color",
+                  "Only vaporizer brand"
+            ],
+            "answer": 0,
+            "why": "The lecture lists these factors as affecting room WAG levels."
+      },
+      {
+            "category": "Scavenger System: History",
+            "q": "The 1970 Occupational Safety and Health Act created which agencies?",
+            "choices": [
+                  "NIOSH and OSHA",
+                  "FDA and DEA only",
+                  "CDC and EPA only",
+                  "AANA and ASA"
+            ],
+            "answer": 0,
+            "why": "The act created NIOSH and OSHA to address occupational hazards."
+      },
+      {
+            "category": "Scavenger System: Guidelines",
+            "q": "NIOSH/OSHA recommendations include what practice?",
+            "choices": [
+                  "Scavenging, ventilation, leak tests, monitoring, education, and signage",
+                  "Ignoring trace gases",
+                  "Eliminating all OR ventilation",
+                  "Using no leak tests"
+            ],
+            "answer": 0,
+            "why": "The lecture lists broad exposure-control practices."
+      },
+      {
+            "category": "Scavenger System: Prevention",
+            "q": "Maintaining WAG below NIOSH limits is impossible without what?",
+            "choices": [
+                  "Integrated scavenging on anesthesia machines",
+                  "Turning off all monitors",
+                  "Using only room air",
+                  "Removing APL valves"
+            ],
+            "answer": 0,
+            "why": "The lecture states integrated scavenging is required to maintain low exposure."
+      },
+      {
+            "category": "Scavenger System: Leaks",
+            "q": "A breathing system leak above what amount is considered excessive/nonallowable in the lecture?",
+            "choices": [
+                  "350 mL/min",
+                  "35 mL/min",
+                  "3.5 L/min",
+                  "10 L/min"
+            ],
+            "answer": 0,
+            "why": "Leaks greater than 350 mL/min are described as excessive."
+      },
+      {
+            "category": "Scavenger System: Work Practices",
+            "q": "Which practice reduces WAG exposure?",
+            "choices": [
+                  "Low gas flows, secure connections, and correct valve use",
+                  "Leaving circuits disconnected",
+                  "Using highest FGF always",
+                  "Skipping preuse checks"
+            ],
+            "answer": 0,
+            "why": "Good work practices reduce WAG and room pollution."
+      },
+      {
+            "category": "Scavenger System: Components",
+            "q": "What does the gas collection assembly collect?",
+            "choices": [
+                  "Excess gas from the breathing circuit, usually APL and ventilator spill valves",
+                  "Fresh gas from the wall outlet",
+                  "Patient arterial blood gas",
+                  "Oxygen cylinder gas only"
+            ],
+            "answer": 0,
+            "why": "It collects excess circuit gases for scavenging."
+      },
+      {
+            "category": "Scavenger System: Components",
+            "q": "Transfer tubing connects what two parts?",
+            "choices": [
+                  "Gas collection assembly to scavenger interface",
+                  "Patient airway to alveoli",
+                  "Vaporizer to oxygen tank",
+                  "Filter to humidifier chamber only"
+            ],
+            "answer": 0,
+            "why": "Transfer tubing carries collected gas to the interface."
+      },
+      {
+            "category": "Scavenger System: Components",
+            "q": "Transfer tubing should be what?",
+            "choices": [
+                  "Short, kink-resistant, off the floor, easily disconnected, and distinct from breathing tubing",
+                  "Long and collapsible",
+                  "Identical to breathing tubing",
+                  "Permanently glued to the floor"
+            ],
+            "answer": 0,
+            "why": "These requirements reduce obstruction and confusion."
+      },
+      {
+            "category": "Scavenger System: Interface",
+            "q": "The scavenger interface is intended to prevent what?",
+            "choices": [
+                  "Barotrauma and excessive negative pressure",
+                  "Humidification",
+                  "Oxygen delivery",
+                  "ETCO2 measurement"
+            ],
+            "answer": 0,
+            "why": "The interface protects the patient/equipment from positive and negative pressure extremes."
+      },
+      {
+            "category": "Scavenger System: Disposal Tubing",
+            "q": "Gas-disposal tubing transfers gas from the interface to what?",
+            "choices": [
+                  "Central vacuum or wall/ceiling disposal connection",
+                  "The patient inspiratory limb",
+                  "The vaporizer sump",
+                  "The oxygen flush valve"
+            ],
+            "answer": 0,
+            "why": "It carries waste gas from interface to disposal."
+      },
+      {
+            "category": "Scavenger System: Disposal Tubing",
+            "q": "Gas-disposal tubing should deliver about what flow with low suction?",
+            "choices": [
+                  "30 L/min",
+                  "3 L/min",
+                  "300 mL/min",
+                  "1 L/min"
+            ],
+            "answer": 0,
+            "why": "The slide lists high flow, 30 L/min, with low suction."
+      },
+      {
+            "category": "Scavenger System: Safety Features",
+            "q": "What does the positive pressure relief valve do?",
+            "choices": [
+                  "Vents excess pressure if the scavenging system occludes",
+                  "Adds suction to the airway",
+                  "Measures inspired CO2",
+                  "Humidifies gas"
+            ],
+            "answer": 0,
+            "why": "It prevents pressure buildup and barotrauma."
+      },
+      {
+            "category": "Scavenger System: Safety Features",
+            "q": "What does the negative pressure relief valve do?",
+            "choices": [
+                  "Admits room air to prevent excessive suction",
+                  "Raises airway pressure intentionally",
+                  "Blocks all waste gas flow",
+                  "Replaces the reservoir bag"
+            ],
+            "answer": 0,
+            "why": "It limits subatmospheric pressure in active systems."
+      },
+      {
+            "category": "Scavenger System: Safety Features",
+            "q": "What is the purpose of a flow indicator?",
+            "choices": [
+                  "Visually confirms flow and direction from interface to disposal",
+                  "Controls vaporizer output",
+                  "Measures blood pressure",
+                  "Prevents all leaks"
+            ],
+            "answer": 0,
+            "why": "Flow indicators show waste gas movement and direction."
+      },
+      {
+            "category": "Scavenger System: Reservoir",
+            "q": "Why does a scavenger system need reservoir capacity?",
+            "choices": [
+                  "To match intermittent collected flow to continuous disposal flow",
+                  "To replace the breathing bag",
+                  "To store oxygen for induction",
+                  "To absorb CO2"
+            ],
+            "answer": 0,
+            "why": "Reservoirs smooth intermittent WAG flow before disposal."
+      },
+      {
+            "category": "Scavenger System: Active",
+            "q": "An active scavenging system uses what to remove waste gas?",
+            "choices": [
+                  "Suction or vacuum",
+                  "Only patient exhalation pressure",
+                  "Gravity only",
+                  "No disposal tubing"
+            ],
+            "answer": 0,
+            "why": "Active systems use negative pressure to remove WAG."
+      },
+      {
+            "category": "Scavenger System: Active",
+            "q": "Unused ports in an active scavenging manifold should be what?",
+            "choices": [
+                  "Capped",
+                  "Left open",
+                  "Connected to the patient airway",
+                  "Filled with water"
+            ],
+            "answer": 0,
+            "why": "Capping prevents room air intake or gas leakage."
+      },
+      {
+            "category": "Scavenger System: Active",
+            "q": "Active scavenging systems are generally what compared with passive systems?",
+            "choices": [
+                  "More effective but more complex and costly",
+                  "Always simpler and cheaper",
+                  "Never require adjustment",
+                  "Unable to remove WAG"
+            ],
+            "answer": 0,
+            "why": "The lecture describes active systems as more effective but more complex/costly."
+      },
+      {
+            "category": "Scavenger System: Passive",
+            "q": "Passive scavenging moves gas by what mechanism?",
+            "choices": [
+                  "Anesthesia circuit pressure without vacuum",
+                  "Central suction",
+                  "Electric pump only",
+                  "Oxygen flush valve only"
+            ],
+            "answer": 0,
+            "why": "Passive systems rely on circuit pressure from exhalation, bagging, or ventilator flow."
+      },
+      {
+            "category": "Scavenger System: Passive",
+            "q": "Which statement about passive scavenging is true?",
+            "choices": [
+                  "No vacuum is used",
+                  "It requires suction at all times",
+                  "It has no relief valves",
+                  "It cannot use tubing"
+            ],
+            "answer": 0,
+            "why": "Passive systems do not use vacuum."
+      },
+      {
+            "category": "Scavenger System: Passive",
+            "q": "Passive systems are generally what?",
+            "choices": [
+                  "Simpler and less expensive but less effective at reducing trace gas levels",
+                  "Most complex and most effective",
+                  "Always closed to atmosphere",
+                  "Always active"
+            ],
+            "answer": 0,
+            "why": "The lecture states passive systems are simpler/cheaper but less effective due to leaks."
+      },
+      {
+            "category": "Scavenger System: Open Interface",
+            "q": "An open scavenger interface is open to atmosphere through what?",
+            "choices": [
+                  "Holes",
+                  "A sealed spring valve only",
+                  "The patient ETT",
+                  "The vaporizer filler port"
+            ],
+            "answer": 0,
+            "why": "Open interfaces have atmospheric openings."
+      },
+      {
+            "category": "Scavenger System: Open Interface",
+            "q": "An open interface has what overpressure risk?",
+            "choices": [
+                  "Low",
+                  "High",
+                  "Always fatal",
+                  "Unmeasurable"
+            ],
+            "answer": 0,
+            "why": "Open-to-atmosphere design vents excess pressure easily."
+      },
+      {
+            "category": "Scavenger System: Open Interface",
+            "q": "Open interfaces commonly require what?",
+            "choices": [
+                  "Suction",
+                  "No reservoir",
+                  "No flow indicator",
+                  "No disposal system"
+            ],
+            "answer": 0,
+            "why": "Open interfaces are commonly active and require suction."
+      },
+      {
+            "category": "Scavenger System: Open Interface",
+            "q": "For an open active interface, the vacuum must do what?",
+            "choices": [
+                  "Exceed average gas output to avoid pressure buildup",
+                  "Be completely off",
+                  "Equal zero",
+                  "Always collapse the reservoir"
+            ],
+            "answer": 0,
+            "why": "Adequate vacuum prevents pressure accumulation."
+      },
+      {
+            "category": "Scavenger System: Closed Interface",
+            "q": "A closed scavenger interface is best described as what?",
+            "choices": [
+                  "Older sealed system with higher overpressure risk relieved by valves",
+                  "Newer open-to-atmosphere system",
+                  "A humidifier",
+                  "A CO2 absorber"
+            ],
+            "answer": 0,
+            "why": "Closed interfaces are sealed and require relief valves for safety."
+      },
+      {
+            "category": "Scavenger System: Closed Interface",
+            "q": "Closed interfaces require which safety feature?",
+            "choices": [
+                  "Pressure relief valves",
+                  "No valves",
+                  "Oxygen flush only",
+                  "Vaporizer interlock"
+            ],
+            "answer": 0,
+            "why": "Relief valves are needed to avoid excessive positive or negative pressure."
+      },
+      {
+            "category": "Scavenger System: Closed Interface",
+            "q": "Closed systems generally capture gases how?",
+            "choices": [
+                  "More efficiently than open systems",
+                  "Less efficiently than all open systems",
+                  "Not at all",
+                  "Only during inspiration"
+            ],
+            "answer": 0,
+            "why": "The slide states closed systems capture gases more efficiently."
+      },
+      {
+            "category": "Scavenger System: Leaks",
+            "q": "Why are machine and ventilator leak tests important?",
+            "choices": [
+                  "No anesthesia machine is leak free and leaks increase room pollution",
+                  "They increase waste gas intentionally",
+                  "They replace scavenging",
+                  "They measure patient hemoglobin"
+            ],
+            "answer": 0,
+            "why": "Leak tests identify WAG escape points."
+      },
+      {
+            "category": "Scavenger System: Precheck",
+            "q": "A scavenger precheck should include what?",
+            "choices": [
+                  "Verify WAG interface valve function",
+                  "Turn off all ventilation",
+                  "Remove reservoir capacity",
+                  "Disconnect disposal tubing"
+            ],
+            "answer": 0,
+            "why": "The lecture lists verifying WAG interface valve function during precheck."
+      },
+      {
+            "category": "Scavenger System: Clinical",
+            "q": "Using the oxygen flush valve can affect WAG how?",
+            "choices": [
+                  "Flushes most WAG into the scavenger",
+                  "Eliminates need for scavenging",
+                  "Blocks the interface",
+                  "Stops waste gas production"
+            ],
+            "answer": 0,
+            "why": "The lecture notes oxygen flush sends much WAG into the scavenger."
+      },
+      {
+            "category": "Breathing Circuits: Breathing Circuits",
+            "q": "A breathing circuit creates what?",
+            "choices": [
+                  "An environment created by the anesthetist for gas delivery and return",
+                  "A sterile blood circuit",
+                  "A scavenger-only pathway",
+                  "A vaporizer filling system"
+            ],
+            "answer": 0,
+            "why": "The lecture defines circuits as the anesthetist-created environment for inspired and expired gases."
+      },
+      {
+            "category": "Breathing Circuits: Breathing Circuits",
+            "q": "The inspiratory side of a circuit does what?",
+            "choices": [
+                  "Goes to the patient",
+                  "Returns exhaled gases",
+                  "Only vents waste gas",
+                  "Only measures pressure"
+            ],
+            "answer": 0,
+            "why": "Inspiratory limb delivers fresh/mixed gases to the patient."
+      },
+      {
+            "category": "Breathing Circuits: Breathing Circuits",
+            "q": "The expiratory side of a circuit does what?",
+            "choices": [
+                  "Returns exhaled gases",
+                  "Delivers only fresh gas",
+                  "Fills the vaporizer",
+                  "Powers the ventilator"
+            ],
+            "answer": 0,
+            "why": "Expiratory limb carries exhaled gases away from the patient."
+      },
+      {
+            "category": "Breathing Circuits: Considerations",
+            "q": "Which is an issue to consider when choosing a breathing circuit?",
+            "choices": [
+                  "Ventilation efficiency, resistance, heat/humidity conservation, pollution, cost, and ease of use",
+                  "Only circuit color",
+                  "Only brand name",
+                  "Only storage location"
+            ],
+            "answer": 0,
+            "why": "The lecture lists these practical considerations."
+      },
+      {
+            "category": "Breathing Circuits: Machine Safety",
+            "q": "An anesthesia machine is designed to prevent which problem?",
+            "choices": [
+                  "Hypoxia, hypercarbia, barotrauma, foreign matter, and overdose",
+                  "Only room pollution",
+                  "Only patient movement",
+                  "Only staff fatigue"
+            ],
+            "answer": 0,
+            "why": "The slide lists these machine safety goals."
+      },
+      {
+            "category": "Breathing Circuits: Gas Mixtures",
+            "q": "Fresh gas flow/inspired mixture includes gases from flowmeters and what else?",
+            "choices": [
+                  "Anesthetic agent from the vaporizer",
+                  "Patient CO2 only",
+                  "Scavenged waste gas",
+                  "Only water vapor"
+            ],
+            "answer": 0,
+            "why": "Fresh mixture contains flowmeter gases plus vaporizer agent."
+      },
+      {
+            "category": "Breathing Circuits: Dead Space",
+            "q": "Which is a type of dead space?",
+            "choices": [
+                  "Anatomic, physiologic, and mechanical",
+                  "Only chemical",
+                  "Only electrical",
+                  "Only humidifier"
+            ],
+            "answer": 0,
+            "why": "The lecture lists all three categories."
+      },
+      {
+            "category": "Breathing Circuits: Exhaled Gas",
+            "q": "What is added from the alveoli to exhaled gas?",
+            "choices": [
+                  "Carbon dioxide and water vapor",
+                  "Only oxygen",
+                  "Only nitrous oxide",
+                  "Only fresh agent"
+            ],
+            "answer": 0,
+            "why": "Alveolar gas adds CO2, water vapor, and body gases."
+      },
+      {
+            "category": "Breathing Circuits: Circuit Design",
+            "q": "A breathing circuit should not allow rebreathing of what?",
+            "choices": [
+                  "CO2",
+                  "Unused oxygen",
+                  "Unused nitrous oxide",
+                  "Anesthetic agent"
+            ],
+            "answer": 0,
+            "why": "CO2 rebreathing causes hypercarbia and should be prevented."
+      },
+      {
+            "category": "Breathing Circuits: Circuit Design",
+            "q": "A circuit may allow rebreathing of what?",
+            "choices": [
+                  "Oxygen not metabolized, nitrous oxide/air, and anesthetic agent",
+                  "CO2 only",
+                  "Foreign matter",
+                  "Room contaminants"
+            ],
+            "answer": 0,
+            "why": "Useful gases can be rebreathed if CO2 is removed or avoided."
+      },
+      {
+            "category": "Breathing Circuits: Breathing Control",
+            "q": "Chemical regulation of respiration is located mainly where?",
+            "choices": [
+                  "Brainstem, including medulla and pons",
+                  "Cerebral cortex only",
+                  "Kidneys only",
+                  "Alveoli only"
+            ],
+            "answer": 0,
+            "why": "The lecture lists medulla oblongata and pons."
+      },
+      {
+            "category": "Breathing Circuits: Boyle Law",
+            "q": "During spontaneous inspiration, lung volume increases and pressure does what?",
+            "choices": [
+                  "Falls below atmospheric pressure so air flows in",
+                  "Rises above atmospheric pressure so air cannot enter",
+                  "Does not change",
+                  "Becomes equal to vapor pressure"
+            ],
+            "answer": 0,
+            "why": "Boyle's law explains airflow into expanding lungs."
+      },
+      {
+            "category": "Breathing Circuits: Voluntary Control",
+            "q": "Voluntary control of breathing is abolished when?",
+            "choices": [
+                  "Patient is deeply sedated or anesthetized past Stage II",
+                  "Patient is awake",
+                  "Patient is anxious",
+                  "Patient takes a deep breath"
+            ],
+            "answer": 0,
+            "why": "The lecture states voluntary control is lost with deeper anesthesia."
+      },
+      {
+            "category": "Breathing Circuits: Anesthesia Effects",
+            "q": "Inhalation agents tend to do what to respiratory pattern?",
+            "choices": [
+                  "Lower tidal volume and increase respiratory rate",
+                  "Increase tidal volume and lower rate always",
+                  "Cause no respiratory change",
+                  "Only increase minute ventilation"
+            ],
+            "answer": 0,
+            "why": "The slide lists decreased TV and increased RR."
+      },
+      {
+            "category": "Breathing Circuits: Anesthesia Effects",
+            "q": "Narcotics tend to do what to respiratory pattern?",
+            "choices": [
+                  "Decrease respiratory rate and increase tidal volume",
+                  "Increase respiratory rate dramatically",
+                  "Have no effect",
+                  "Always prevent apnea"
+            ],
+            "answer": 0,
+            "why": "The lecture contrasts narcotics with inhalation agents."
+      },
+      {
+            "category": "Breathing Circuits: Anesthesia Effects",
+            "q": "Deep sedation or muscle relaxation can lead to what?",
+            "choices": [
+                  "Apnea",
+                  "Hyperventilation only",
+                  "Increased voluntary control",
+                  "Improved chemoreceptor drive"
+            ],
+            "answer": 0,
+            "why": "Both deep sedation and paralysis can cause apnea."
+      },
+      {
+            "category": "Breathing Circuits: Temperature",
+            "q": "Increased temperature generally does what to respiratory rate?",
+            "choices": [
+                  "Increases it",
+                  "Decreases it",
+                  "Eliminates ventilation",
+                  "Has no effect"
+            ],
+            "answer": 0,
+            "why": "The lecture states increased temperature increases respiratory rate."
+      },
+      {
+            "category": "Breathing Circuits: Classification",
+            "q": "Breathing systems are classified as what?",
+            "choices": [
+                  "Open, semi-open, semi-closed, and closed",
+                  "Only active/passive",
+                  "Only adult/pediatric",
+                  "Only high/low pressure"
+            ],
+            "answer": 0,
+            "why": "The lecture gives these major circuit classes."
+      },
+      {
+            "category": "Breathing Circuits: Ideal Circuit",
+            "q": "Which feature belongs to the ideal breathing circuit?",
+            "choices": [
+                  "Efficient ventilation, easy depth control, heat/humidity conservation, low resistance, no OR pollution, simple, inexpensive",
+                  "High resistance and high pollution",
+                  "Poor depth control",
+                  "Difficult assembly"
+            ],
+            "answer": 0,
+            "why": "These are the ideal circuit criteria listed in the lecture."
+      },
+      {
+            "category": "Breathing Circuits: Open Insufflation",
+            "q": "Open insufflation involves what?",
+            "choices": [
+                  "Blowing anesthetic gases across the patient's face",
+                  "Direct closed-circuit rebreathing",
+                  "A CO2 absorber canister",
+                  "A unidirectional valve system"
+            ],
+            "answer": 0,
+            "why": "Insufflation avoids direct airway contact by blowing gas across the face."
+      },
+      {
+            "category": "Breathing Circuits: Open Insufflation",
+            "q": "Open insufflation can avoid rebreathing if what is used?",
+            "choices": [
+                  "High flows greater than 10 L/min",
+                  "Very low flows",
+                  "No oxygen",
+                  "Closed APL valve"
+            ],
+            "answer": 0,
+            "why": "High flows wash out exhaled gases."
+      },
+      {
+            "category": "Breathing Circuits: Open Insufflation",
+            "q": "A major limitation of open insufflation is what?",
+            "choices": [
+                  "Ventilation cannot be controlled",
+                  "It requires a CO2 absorber",
+                  "It always conserves humidity",
+                  "It has no OR pollution"
+            ],
+            "answer": 0,
+            "why": "Open insufflation does not provide controlled ventilation."
+      },
+      {
+            "category": "Breathing Circuits: Open Drop",
+            "q": "Open-drop anesthesia is associated with what mask?",
+            "choices": [
+                  "Schimmelbusch mask",
+                  "LMA Supreme",
+                  "Bain mask",
+                  "Circle absorber mask"
+            ],
+            "answer": 0,
+            "why": "The slide names the Schimmelbusch mask."
+      },
+      {
+            "category": "Breathing Circuits: Open Systems",
+            "q": "Which is a disadvantage of open systems?",
+            "choices": [
+                  "Poor control of inspired gas concentration and depth",
+                  "Excellent scavenging",
+                  "No waste gas pollution",
+                  "Controlled ventilation"
+            ],
+            "answer": 0,
+            "why": "Open systems have poor depth control and poor ventilation control."
+      },
+      {
+            "category": "Breathing Circuits: Draw-over",
+            "q": "Draw-over anesthesia uses what as the carrier gas?",
+            "choices": [
+                  "Ambient air",
+                  "Only nitrous oxide",
+                  "Only CO2",
+                  "Only scavenged gas"
+            ],
+            "answer": 0,
+            "why": "Draw-over circuits use ambient air as carrier gas and can add oxygen."
+      },
+      {
+            "category": "Breathing Circuits: Draw-over",
+            "q": "What is a key rule for draw-over anesthesia in the lecture?",
+            "choices": [
+                  "Never use N2O",
+                  "Always use N2O",
+                  "Never use oxygen",
+                  "Always use a circle absorber"
+            ],
+            "answer": 0,
+            "why": "The slide explicitly says never use N2O."
+      },
+      {
+            "category": "Breathing Circuits: Mapleson",
+            "q": "Mapleson systems are classified as what type?",
+            "choices": [
+                  "Semi-open",
+                  "Closed",
+                  "Open-drop only",
+                  "Double-circuit ventilators"
+            ],
+            "answer": 0,
+            "why": "Mapleson systems are semi-open systems."
+      },
+      {
+            "category": "Breathing Circuits: Mapleson",
+            "q": "Mapleson systems prevent CO2 rebreathing mainly by using what?",
+            "choices": [
+                  "High fresh gas flows",
+                  "CO2 absorbent canisters",
+                  "Unidirectional valves only",
+                  "Piston ventilators"
+            ],
+            "answer": 0,
+            "why": "High FGF flushes exhaled CO2 from Mapleson systems."
+      },
+      {
+            "category": "Breathing Circuits: Mapleson",
+            "q": "Which components are part of a Mapleson system?",
+            "choices": [
+                  "Breathing tubes, fresh gas inlet, APL valve, and reservoir bag",
+                  "CO2 absorber and unidirectional valves only",
+                  "Bellows and drive gas circuit",
+                  "Scavenger interface only"
+            ],
+            "answer": 0,
+            "why": "These are the Mapleson components listed."
+      },
+      {
+            "category": "Breathing Circuits: Mapleson",
+            "q": "For spontaneous ventilation, which Mapleson is best according to the lecture?",
+            "choices": [
+                  "A",
+                  "D",
+                  "F",
+                  "C"
+            ],
+            "answer": 0,
+            "why": "The lecture ranks spontaneous ventilation as A best."
+      },
+      {
+            "category": "Breathing Circuits: Mapleson",
+            "q": "For controlled ventilation, which Mapleson is best according to the lecture?",
+            "choices": [
+                  "D",
+                  "A",
+                  "B",
+                  "C"
+            ],
+            "answer": 0,
+            "why": "The lecture states controlled D best."
+      },
+      {
+            "category": "Breathing Circuits: Mapleson",
+            "q": "Which Mapleson system has the lowest resistance?",
+            "choices": [
+                  "E",
+                  "A",
+                  "B",
+                  "C"
+            ],
+            "answer": 0,
+            "why": "The slide lists lowest resistance as E."
+      },
+      {
+            "category": "Breathing Circuits: Mapleson",
+            "q": "Which Mapleson is described as the best compromise?",
+            "choices": [
+                  "F",
+                  "A",
+                  "B",
+                  "C"
+            ],
+            "answer": 0,
+            "why": "The lecture lists best compromise as F."
+      },
+      {
+            "category": "Breathing Circuits: Bain",
+            "q": "The Bain circuit is a modified what?",
+            "choices": [
+                  "Mapleson D",
+                  "Circle system",
+                  "Open-drop system",
+                  "Piston ventilator"
+            ],
+            "answer": 0,
+            "why": "Bain is a modified Mapleson D."
+      },
+      {
+            "category": "Breathing Circuits: Bain",
+            "q": "In a Bain circuit, fresh gas travels through what?",
+            "choices": [
+                  "Thin inner tubing",
+                  "Outer corrugated tube",
+                  "CO2 absorber canister",
+                  "Scavenger tubing"
+            ],
+            "answer": 0,
+            "why": "Fresh gas enters through the inner tube; exhaled gas exits via outer tube."
+      },
+      {
+            "category": "Breathing Circuits: Bain",
+            "q": "The Bain circuit needs approximately what FGF to prevent rebreathing?",
+            "choices": [
+                  "2.5 times minute ventilation",
+                  "0.3 L/min",
+                  "Exactly tidal volume",
+                  "No fresh gas flow"
+            ],
+            "answer": 0,
+            "why": "The lecture lists FGF 2.5x MV."
+      },
+      {
+            "category": "Breathing Circuits: Mapleson Advantages",
+            "q": "Why were Mapleson systems popular in pediatrics?",
+            "choices": [
+                  "Low resistance and less work of breathing",
+                  "High resistance",
+                  "Built-in CO2 absorption",
+                  "No need for fresh gas"
+            ],
+            "answer": 0,
+            "why": "Low resistance made them useful for pediatrics."
+      },
+      {
+            "category": "Breathing Circuits: Mapleson Disadvantages",
+            "q": "Which is a Mapleson disadvantage?",
+            "choices": [
+                  "Need for high flow rates, cost, dry/cold airway, pollution, and difficulty switching ventilation modes",
+                  "No OR pollution",
+                  "Excellent humidity at low flow",
+                  "Built-in CO2 absorber"
+            ],
+            "answer": 0,
+            "why": "High flows create many disadvantages."
+      },
+      {
+            "category": "Ventilators: Goals",
+            "q": "Which is a major goal of anesthesia ventilators?",
+            "choices": [
+                  "Efficient oxygenation and adequate CO2 removal",
+                  "Producing anesthetic vapor",
+                  "Scavenging all WAG",
+                  "Humidifying all gases"
+            ],
+            "answer": 0,
+            "why": "Ventilator goals include oxygenation, CO2 removal, consistent minute ventilation, and no patient injury."
+      },
+      {
+            "category": "Ventilators: Flow",
+            "q": "Ventilators generate flow by creating what?",
+            "choices": [
+                  "A pressure gradient between proximal airway and alveoli",
+                  "A temperature gradient only",
+                  "A vaporizer gradient",
+                  "A scavenger vacuum only"
+            ],
+            "answer": 0,
+            "why": "Gas flows down a pressure gradient."
+      },
+      {
+            "category": "Ventilators: History",
+            "q": "Older iron lung ventilators generated what kind of pressure?",
+            "choices": [
+                  "Negative pressure around/inside the chest",
+                  "Positive pressure into the upper airway",
+                  "No pressure gradient",
+                  "Only CPAP"
+            ],
+            "answer": 0,
+            "why": "Iron lungs used negative pressure ventilation."
+      },
+      {
+            "category": "Ventilators: Modern Ventilators",
+            "q": "Modern ventilators generally generate what?",
+            "choices": [
+                  "Positive pressure and gas flow into the upper airway",
+                  "Negative pressure around the chest only",
+                  "No airway pressure",
+                  "Passive scavenging"
+            ],
+            "answer": 0,
+            "why": "Modern anesthesia ventilators are positive-pressure devices."
+      },
+      {
+            "category": "Ventilators: Cycle",
+            "q": "Which is one phase of the ventilatory cycle?",
+            "choices": [
+                  "Inspiration",
+                  "Vaporization",
+                  "Scavenging",
+                  "Filtration"
+            ],
+            "answer": 0,
+            "why": "The four phases include inspiration, transition to expiration, expiration, and transition back to inspiration."
+      },
+      {
+            "category": "Ventilators: Inspiratory Phase",
+            "q": "Ventilators can generate tidal volume using which pattern?",
+            "choices": [
+                  "Constant pressure, constant flow, or non-constant flow",
+                  "Only room air diffusion",
+                  "Only patient suction",
+                  "Only gravity"
+            ],
+            "answer": 0,
+            "why": "The lecture lists these inspiratory flow/pressure patterns."
+      },
+      {
+            "category": "Ventilators: Solenoid",
+            "q": "What does the solenoid valve set?",
+            "choices": [
+                  "Timing of when inspiration begins and ends",
+                  "The vaporizer concentration",
+                  "The oxygen cylinder pressure",
+                  "The patient hemoglobin"
+            ],
+            "answer": 0,
+            "why": "The solenoid controls timing and I:E ratio."
+      },
+      {
+            "category": "Ventilators: Cycling",
+            "q": "Termination of inspiration may be determined by what?",
+            "choices": [
+                  "Preset time, pressure, or tidal volume",
+                  "Skin temperature only",
+                  "Pulse oximetry only",
+                  "Scavenger flow only"
+            ],
+            "answer": 0,
+            "why": "Ventilator cycling can be time-, pressure-, or volume-based."
+      },
+      {
+            "category": "Ventilators: Time Cycled",
+            "q": "In time-cycled ventilators, tidal volume is determined by what?",
+            "choices": [
+                  "Inspiratory duration and flow rate",
+                  "Only ETCO2",
+                  "Only PEEP valve color",
+                  "Only patient temperature"
+            ],
+            "answer": 0,
+            "why": "TV and PIP vary, while time and flow determine delivered volume."
+      },
+      {
+            "category": "Ventilators: Pressure Cycled",
+            "q": "A pressure-cycled ventilator switches to expiration when what occurs?",
+            "choices": [
+                  "Preset pressure is reached",
+                  "Preset volume is guaranteed",
+                  "The patient exhales spontaneously",
+                  "A timer always expires first"
+            ],
+            "answer": 0,
+            "why": "It remains in inspiration until the set pressure is reached."
+      },
+      {
+            "category": "Ventilators: Pressure Cycled",
+            "q": "Large leaks in a pressure-cycled ventilator may cause what?",
+            "choices": [
+                  "Ventilator remains in inspiratory phase",
+                  "Immediate cycling to expiration",
+                  "Guaranteed larger tidal volume",
+                  "No effect"
+            ],
+            "answer": 0,
+            "why": "Leaks may prevent reaching preset pressure."
+      },
+      {
+            "category": "Ventilators: Volume Cycled",
+            "q": "Volume-cycled ventilators vary what to deliver a preset volume?",
+            "choices": [
+                  "Inspiratory duration and pressure",
+                  "Patient hemoglobin",
+                  "Scavenger flow",
+                  "Filter pore size"
+            ],
+            "answer": 0,
+            "why": "The ventilator adjusts pressure/time characteristics to deliver preset volume."
+      },
+      {
+            "category": "Ventilators: Expiration",
+            "q": "Expiration during mechanical ventilation is generally what?",
+            "choices": [
+                  "Passive",
+                  "Actively sucked out by the ventilator always",
+                  "Impossible with PEEP",
+                  "Controlled by vaporizer"
+            ],
+            "answer": 0,
+            "why": "Exhalation is passive and depends on resistance and compliance."
+      },
+      {
+            "category": "Ventilators: Expiration",
+            "q": "Expiration reduces airway pressure to what?",
+            "choices": [
+                  "Atmospheric level or preset PEEP valve level",
+                  "Zero oxygen concentration",
+                  "Vaporizer setting",
+                  "Scavenger suction pressure only"
+            ],
+            "answer": 0,
+            "why": "Pressure falls to atmospheric or selected PEEP."
+      },
+      {
+            "category": "Ventilators: CMV",
+            "q": "Controlled mechanical ventilation in volume control delivers what?",
+            "choices": [
+                  "A set tidal volume based on timing without regard for pressure needed",
+                  "Only spontaneous breaths",
+                  "No preset volume",
+                  "Only pressure support"
+            ],
+            "answer": 0,
+            "why": "Volume control prioritizes set volume and rate."
+      },
+      {
+            "category": "Ventilators: CMV",
+            "q": "CMV volume control is best suited for which patients?",
+            "choices": [
+                  "Apneic patients",
+                  "Alert spontaneously breathing patients only",
+                  "Patients needing no ventilation",
+                  "Patients with no airway"
+            ],
+            "answer": 0,
+            "why": "The lecture notes it is best for apneic patients."
+      },
+      {
+            "category": "Ventilators: Pressure Control",
+            "q": "In pressure control ventilation, what is fixed?",
+            "choices": [
+                  "Peak inspiratory pressure",
+                  "Tidal volume",
+                  "Minute ventilation always",
+                  "Respiratory alkalosis"
+            ],
+            "answer": 0,
+            "why": "PCV delivers gas to reach a pressure, not a guaranteed volume."
+      },
+      {
+            "category": "Ventilators: Pressure Control",
+            "q": "Pressure control can reduce what?",
+            "choices": [
+                  "Barotrauma and volutrauma",
+                  "All atelectasis instantly",
+                  "All CO2 production",
+                  "Need for monitors"
+            ],
+            "answer": 0,
+            "why": "Lower pressure targeting can reduce pressure/volume injury risk."
+      },
+      {
+            "category": "Ventilators: Assist Control",
+            "q": "In assist-control, a spontaneous breath receives what?",
+            "choices": [
+                  "The full preset value",
+                  "No support",
+                  "Only CPAP",
+                  "Only scavenging"
+            ],
+            "answer": 0,
+            "why": "Machine and patient-triggered breaths receive the preset TV/value."
+      },
+      {
+            "category": "Ventilators: Assist Control",
+            "q": "Overbreathing the ventilator in assist-control can cause what?",
+            "choices": [
+                  "Respiratory alkalosis and hyperventilation",
+                  "Guaranteed apnea",
+                  "No CO2 change",
+                  "Bronchospasm only"
+            ],
+            "answer": 0,
+            "why": "Extra full supported breaths can overventilate the patient."
+      },
+      {
+            "category": "Ventilators: SIMV",
+            "q": "SIMV times mandatory breaths with what?",
+            "choices": [
+                  "Initiation of spontaneous breaths",
+                  "Only the oxygen flush valve",
+                  "The scavenger bag filling",
+                  "Vaporizer temperature"
+            ],
+            "answer": 0,
+            "why": "SIMV synchronizes mandatory breaths with patient effort."
+      },
+      {
+            "category": "Ventilators: SIMV",
+            "q": "SIMV helps prevent what?",
+            "choices": [
+                  "Breath stacking and bucking",
+                  "All leaks",
+                  "All hypoxia",
+                  "All airway resistance"
+            ],
+            "answer": 0,
+            "why": "Synchronization improves comfort and reduces stacking/bucking."
+      },
+      {
+            "category": "Ventilators: Pressure Support",
+            "q": "Pressure support ventilation augments what?",
+            "choices": [
+                  "Spontaneously initiated inspiratory efforts",
+                  "Mandatory breaths only",
+                  "Expiration only",
+                  "Scavenger suction"
+            ],
+            "answer": 0,
+            "why": "PSV adds inspiratory assistance to spontaneous breathing."
+      },
+      {
+            "category": "Ventilators: Pressure Support",
+            "q": "Pressure support has no what?",
+            "choices": [
+                  "Baseline respiratory rate",
+                  "Inspiratory support",
+                  "Gas flow with effort",
+                  "Use during emergence"
+            ],
+            "answer": 0,
+            "why": "The lecture notes PSV has no baseline RR."
+      },
+      {
+            "category": "Ventilators: APRV",
+            "q": "APRV is used for patients who are doing what?",
+            "choices": [
+                  "Spontaneously ventilating",
+                  "Completely apneic only",
+                  "Not connected to a ventilator",
+                  "Only mask ventilated"
+            ],
+            "answer": 0,
+            "why": "APRV supports spontaneous ventilation with high CPAP and pressure releases."
+      },
+      {
+            "category": "Ventilators: IRV",
+            "q": "Inverse ratio ventilation reverses what normal relationship?",
+            "choices": [
+                  "I:E ratio so inspiration is longer relative to expiration",
+                  "Oxygen and nitrogen percentages",
+                  "Patient and drive gas circuits",
+                  "Humidifier and scavenger positions"
+            ],
+            "answer": 0,
+            "why": "IRV makes inspiration longer than usual."
+      },
+      {
+            "category": "Ventilators: IRV",
+            "q": "IRV usually requires the patient to be what?",
+            "choices": [
+                  "Sedated and paralyzed",
+                  "Awake and eating",
+                  "Disconnected from the ventilator",
+                  "On no monitors"
+            ],
+            "answer": 0,
+            "why": "IRV is uncomfortable and can require paralysis/sedation."
+      },
+      {
+            "category": "Ventilators: BiPAP",
+            "q": "BiPAP uses how many pressure levels?",
+            "choices": [
+                  "Two",
+                  "One",
+                  "Zero",
+                  "Fourteen"
+            ],
+            "answer": 0,
+            "why": "It has inspiratory and expiratory pressure levels."
+      },
+      {
+            "category": "Ventilators: CPAP",
+            "q": "CPAP is applied during what portion of breathing?",
+            "choices": [
+                  "Inspiration and expiration during spontaneous breathing",
+                  "Expiration only",
+                  "Inspiration only",
+                  "Only during apnea"
+            ],
+            "answer": 0,
+            "why": "CPAP maintains continuous positive pressure throughout spontaneous breathing."
+      },
+      {
+            "category": "Ventilators: CPAP",
+            "q": "CPAP mask pressure above 15 cm H2O increases risk of what?",
+            "choices": [
+                  "Gastric distention and regurgitation",
+                  "Guaranteed lung collapse",
+                  "CO2 absorber exhaustion",
+                  "Filter wetting only"
+            ],
+            "answer": 0,
+            "why": "The lecture warns about gastric distention/regurgitation, especially with masks."
+      },
+      {
+            "category": "Ventilators: Jet Ventilation",
+            "q": "Jet ventilation uses what to achieve ventilation?",
+            "choices": [
+                  "High-pressure gas blown into the airway",
+                  "A standard ETT cuff leak",
+                  "A passive HME",
+                  "A scavenger reservoir"
+            ],
+            "answer": 0,
+            "why": "Jet ventilation uses high-pressure gas directed into the airway."
+      },
+      {
+            "category": "Ventilators: Jet Ventilation",
+            "q": "Jet ventilation carries risk of what?",
+            "choices": [
+                  "Barotrauma",
+                  "Guaranteed low pressure",
+                  "No airway injury",
+                  "No oxygen delivery"
+            ],
+            "answer": 0,
+            "why": "High pressures can cause barotrauma."
+      },
+      {
+            "category": "Ventilators: PEEP",
+            "q": "PEEP improves oxygenation partly by doing what?",
+            "choices": [
+                  "Stabilizing and expanding partially collapsed alveoli",
+                  "Removing all airway pressure",
+                  "Stopping expiration completely",
+                  "Absorbing volatile agents"
+            ],
+            "answer": 0,
+            "why": "PEEP recruits/stabilizes alveoli and improves FRC/compliance/VQ."
+      },
+      {
+            "category": "Ventilators: PEEP",
+            "q": "PEEP is considered best treatment for what in the lecture?",
+            "choices": [
+                  "Atelectasis",
+                  "Vaporizer leak",
+                  "Scavenger failure",
+                  "Filter contamination"
+            ],
+            "answer": 0,
+            "why": "The slide states PEEP is the best treatment for atelectasis."
+      },
+      {
+            "category": "Ventilators: Design",
+            "q": "Traditional anesthesia ventilators are commonly what type?",
+            "choices": [
+                  "Double-circuit, pneumatically powered, electronically controlled",
+                  "Only piston and no electronics",
+                  "Purely manual bags",
+                  "Open Mapleson only"
+            ],
+            "answer": 0,
+            "why": "The lecture lists double circuit, pneumatic power, and electronic control."
+      },
+      {
+            "category": "Ventilators: Design",
+            "q": "Modern ventilators commonly use what?",
+            "choices": [
+                  "Microprocessor control with pressure and flow sensors",
+                  "No sensors",
+                  "Only negative pressure chambers",
+                  "Only manual valves"
+            ],
+            "answer": 0,
+            "why": "Modern systems use microprocessor control and sensors."
+      },
+      {
+            "category": "Ventilators: Double Circuit",
+            "q": "In a double-circuit ventilator, what replaces the reservoir bag?",
+            "choices": [
+                  "Bellows",
+                  "HME",
+                  "Scavenger interface",
+                  "CO2 absorber"
+            ],
+            "answer": 0,
+            "why": "Bellows take the place of the reservoir bag in the anesthesia circuit."
+      },
+      {
+            "category": "Ventilators: Double Circuit",
+            "q": "The patient circuit inside the bellows contains what?",
+            "choices": [
+                  "O2, N2O, air, and inhalational gas mixture",
+                  "Only drive gas",
+                  "Only room air",
+                  "Only scavenged gas"
+            ],
+            "answer": 0,
+            "why": "The patient circuit contains the breathing gas mixture."
+      },
+      {
+            "category": "Ventilators: Double Circuit",
+            "q": "The drive gas circuit is located where?",
+            "choices": [
+                  "Outside the bellows between the bellows and housing",
+                  "Inside the ETT",
+                  "In the vaporizer sump",
+                  "In the HME filter only"
+            ],
+            "answer": 0,
+            "why": "Drive gas outside the bellows compresses it."
+      },
+      {
+            "category": "Ventilators: Bellows",
+            "q": "Ascending bellows do what during expiration?",
+            "choices": [
+                  "Rise",
+                  "Collapse",
+                  "Remain empty",
+                  "Open the APL valve"
+            ],
+            "answer": 0,
+            "why": "Ascending/standing bellows rise during expiration."
+      },
+      {
+            "category": "Ventilators: Bellows",
+            "q": "Descending bellows do what during expiration?",
+            "choices": [
+                  "Collapse",
+                  "Rise",
+                  "Fill upward",
+                  "Turn off drive gas"
+            ],
+            "answer": 0,
+            "why": "Descending/hanging bellows collapse during expiration."
+      },
+      {
+            "category": "Ventilators: Drive Gas",
+            "q": "Ohmeda machines use what as pneumatic power in this lecture?",
+            "choices": [
+                  "100% oxygen",
+                  "100% nitrogen",
+                  "Only room air",
+                  "Vacuum"
+            ],
+            "answer": 0,
+            "why": "The slide states Ohmeda uses 100% O2 for pneumatic power."
+      },
+      {
+            "category": "Ventilators: Drive Gas",
+            "q": "Ohmeda oxygen consumption is at least equal to what?",
+            "choices": [
+                  "Minute ventilation",
+                  "Tidal volume only",
+                  "Fresh gas flow only",
+                  "PEEP level"
+            ],
+            "answer": 0,
+            "why": "O2 is consumed at a rate at least equal to minute ventilation."
+      },
+      {
+            "category": "Ventilators: Drive Gas",
+            "q": "Drager machines use what for pneumatic power?",
+            "choices": [
+                  "O2 and air",
+                  "Only nitrous oxide",
+                  "Only vacuum",
+                  "Only CO2"
+            ],
+            "answer": 0,
+            "why": "The lecture states Drager uses oxygen and air."
+      },
+      {
+            "category": "Ventilators: Drive Gas",
+            "q": "Drager machines reduce oxygen consumption by using what?",
+            "choices": [
+                  "A Venturi device",
+                  "A Schimmelbusch mask",
+                  "A charcoal canister",
+                  "A Bain inner tube"
+            ],
+            "answer": 0,
+            "why": "The slide mentions a Venturi device incorporated into the machine."
+      }
+];
+
+    function shuffleQuestionChoices(question) {
+      const choices = question.choices.map((choice, index) => ({ choice, index }));
+      for (let i = choices.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [choices[i], choices[j]] = [choices[j], choices[i]];
+      }
+      return {
+        ...question,
+        choices: choices.map(item => item.choice),
+        answer: choices.findIndex(item => item.index === question.answer)
+      };
+    }
+
+    let deck = questions.map(shuffleQuestionChoices);
+    let current = 0;
+    let answers = Array(deck.length).fill(null);
+
+    const scoreCard = document.getElementById('scoreCard');
+    const categoryEl = document.getElementById('category');
+    const counterEl = document.getElementById('counter');
+    const questionEl = document.getElementById('question');
+    const choicesEl = document.getElementById('choices');
+    const feedbackEl = document.getElementById('feedback');
+    const progressText = document.getElementById('progressText');
+    const progressBar = document.getElementById('progressBar');
+    const correctStat = document.getElementById('correctStat');
+    const wrongStat = document.getElementById('wrongStat');
+    const reviewList = document.getElementById('reviewList');
+    const quizContent = document.getElementById('quizContent');
+    const finalScreen = document.getElementById('finalScreen');
+    const finalScore = document.getElementById('finalScore');
+    const finalCopy = document.getElementById('finalCopy');
+
+    function counts() {
+      const answered = answers.filter(answer => answer !== null).length;
+      const correct = answers.filter((answer, i) => answer === deck[i].answer).length;
+      const wrong = answers.filter((answer, i) => answer !== null && answer !== deck[i].answer).length;
+      return { answered, correct, wrong };
+    }
+
+    function render() {
+      const item = deck[current];
+      const picked = answers[current];
+      categoryEl.textContent = item.category;
+      counterEl.textContent = `Question ${current + 1} / ${deck.length}`;
+      questionEl.textContent = item.q;
+      choicesEl.replaceChildren();
+
+      item.choices.forEach((choice, i) => {
+        const button = document.createElement('button');
+        button.className = 'choice';
+        if (picked !== null && i === item.answer) button.classList.add('correct');
+        if (picked !== null && i === picked && picked !== item.answer) button.classList.add('wrong');
+        button.dataset.i = i;
+        button.disabled = picked !== null;
+
+        const letter = document.createElement('span');
+        letter.className = 'letter';
+        letter.textContent = String.fromCharCode(65 + i);
+
+        const text = document.createElement('span');
+        text.textContent = choice;
+
+        button.append(letter, text);
+        choicesEl.append(button);
+      });
+
+      if (picked === null) {
+        feedbackEl.className = 'feedback';
+        feedbackEl.replaceChildren();
+      } else {
+        const correct = picked === item.answer;
+        feedbackEl.className = 'feedback show';
+        feedbackEl.replaceChildren();
+        const strong = document.createElement('strong');
+        strong.textContent = correct ? 'Correct' : 'Missed';
+        const explanation = document.createElement('div');
+        explanation.textContent = item.why;
+        feedbackEl.append(strong, document.createElement('br'), explanation);
+      }
+
+      const stats = counts();
+      const pct = Math.round((stats.answered / deck.length) * 100);
+      progressText.textContent = `${pct}%`;
+      progressBar.style.width = `${pct}%`;
+      correctStat.textContent = stats.correct;
+      wrongStat.textContent = stats.wrong;
+      scoreCard.innerHTML = `Score: ${stats.correct} / ${deck.length}<br>Answered: ${stats.answered}`;
+      renderReview();
+    }
+
+    function renderReview() {
+      reviewList.replaceChildren();
+      deck.forEach((item, i) => {
+        const li = document.createElement('li');
+        if (i === current) li.classList.add('current');
+        if (answers[i] !== null && answers[i] === item.answer) li.classList.add('correct');
+        if (answers[i] !== null && answers[i] !== item.answer) li.classList.add('wrong');
+        li.dataset.i = i;
+        li.textContent = `${i + 1}. ${item.category}`;
+        reviewList.append(li);
+      });
+    }
+
+    function choose(index) {
+      if (answers[current] !== null) return;
+      answers[current] = index;
+      render();
+      if (answers.every(answer => answer !== null)) {
+        setTimeout(showFinal, 500);
+      }
+    }
+
+    function next() {
+      if (current < deck.length - 1) current += 1;
+      else if (answers.every(answer => answer !== null)) return showFinal();
+      render();
+    }
+
+    function prev() {
+      if (current > 0) current -= 1;
+      render();
+    }
+
+    function showFinal() {
+      const stats = counts();
+      const pct = Math.round((stats.correct / deck.length) * 100);
+      finalScore.textContent = `${pct}%`;
+      finalCopy.textContent = `You answered ${stats.correct} of ${deck.length} correctly. Use review to revisit missed topics, then restart when ready.`;
+      quizContent.classList.add('hide');
+      finalScreen.classList.add('show');
+    }
+
+    function hideFinal() {
+      quizContent.classList.remove('hide');
+      finalScreen.classList.remove('show');
+    }
+
+    function restart(shuffle = false) {
+      deck = questions.map(shuffleQuestionChoices);
+      if (shuffle) {
+        for (let i = deck.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [deck[i], deck[j]] = [deck[j], deck[i]];
+        }
+      }
+      current = 0;
+      answers = Array(deck.length).fill(null);
+      hideFinal();
+      render();
+    }
+
+    choicesEl.addEventListener('click', event => {
+      const button = event.target.closest('.choice');
+      if (!button) return;
+      choose(Number(button.dataset.i));
+    });
+
+    reviewList.addEventListener('click', event => {
+      const item = event.target.closest('li');
+      if (!item) return;
+      current = Number(item.dataset.i);
+      hideFinal();
+      render();
+    });
+
+    document.getElementById('nextBtn').addEventListener('click', next);
+    document.getElementById('prevBtn').addEventListener('click', prev);
+    document.getElementById('shuffleBtn').addEventListener('click', () => restart(true));
+    document.getElementById('restartBtn').addEventListener('click', () => restart(false));
+    document.getElementById('reviewBtn').addEventListener('click', () => {
+      current = answers.findIndex((answer, i) => answer !== null && answer !== deck[i].answer);
+      if (current < 0) current = 0;
+      hideFinal();
+      render();
+    });
+
+    document.addEventListener('keydown', event => {
+      if (event.key === 'ArrowRight') next();
+      if (event.key === 'ArrowLeft') prev();
+      if (/^[1-4]$/.test(event.key)) choose(Number(event.key) - 1);
+      if (event.key.toLowerCase() === 'r') restart(false);
+    });
+
+    render();
+  </script>
+</body>
+</html>

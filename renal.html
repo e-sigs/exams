@@ -46,7 +46,7 @@
 
     .shell {
       position: relative;
-      width: min(1120px, calc(100vw - 30px));
+      width: min(1280px, calc(100vw - 30px));
       margin: 0 auto;
       padding: 26px 0 34px;
     }
@@ -88,10 +88,15 @@
     }
 
     .quiz-nav {
-      grid-column: 1 / -1;
-      display: flex;
-      flex-wrap: wrap;
+      position: sticky;
+      top: 20px;
+      display: grid;
       gap: 10px;
+      border: 2px solid var(--green);
+      border-radius: 22px;
+      padding: 18px;
+      background: rgba(255,249,238,.75);
+      box-shadow: 8px 8px 0 rgba(15,59,47,.86);
       font: 900 12px/1 "Trebuchet MS", sans-serif;
       letter-spacing: .1em;
       text-transform: uppercase;
@@ -99,8 +104,8 @@
 
     .quiz-nav a {
       border: 2px solid var(--green);
-      border-radius: 999px;
-      padding: 10px 12px;
+      border-radius: 16px;
+      padding: 13px 14px;
       background: rgba(255,249,238,.75);
       color: var(--green);
       text-decoration: none;
@@ -114,7 +119,7 @@
 
     .layout {
       display: grid;
-      grid-template-columns: 1fr 300px;
+      grid-template-columns: 220px minmax(0, 1fr) 300px;
       gap: 24px;
       align-items: start;
     }
@@ -365,10 +370,10 @@
       font: 800 18px/1.45 "Trebuchet MS", sans-serif;
     }
 
-    @media (max-width: 900px) {
+    @media (max-width: 1050px) {
       header, .layout { grid-template-columns: 1fr; }
       .score-card { text-align: left; }
-      aside { order: -1; }
+      .quiz-nav { position: static; }
       .quiz-card { min-height: auto; }
       .review { max-height: 150px; }
     }
@@ -382,13 +387,15 @@
         <h1>Renal Outline Quiz</h1>
       </div>
       <div class="score-card" id="scoreCard">Score: 0 / 0<br>Answered: 0</div>
-      <nav class="quiz-nav" aria-label="Quiz pages">
-        <a href="./">Machine Quiz</a>
-        <a href="./renal.html" aria-current="page">Renal Outline Quiz</a>
-      </nav>
     </header>
 
     <section class="layout">
+      <nav class="quiz-nav" aria-label="Quiz pages">
+        <p class="panel-title">Quiz List</p>
+        <a href="./machine.html">Machine Quiz</a>
+        <a href="./renal.html" aria-current="page">Renal Outline Quiz</a>
+      </nav>
+
       <article class="quiz-card">
         <div class="quiz-content" id="quizContent">
           <div class="tag-row"><span class="chip" id="category">Category</span><span id="counter">Question 1 / 1</span></div>
